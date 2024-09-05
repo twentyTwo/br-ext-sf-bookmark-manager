@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Salesforce Banner",
+  "version": "1.0",
+  "description": "Adds a thin banner to Salesforce tabs",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.force.com/*"],
+      "css": ["styles.css"],
+      "js": ["content.js"]
+    }
+  ]
+}

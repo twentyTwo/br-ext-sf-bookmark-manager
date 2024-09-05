@@ -1,0 +1,13 @@
+#salesforce-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
+  padding: 3px 0;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 9999;
+}
