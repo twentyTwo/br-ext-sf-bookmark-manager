@@ -74,7 +74,7 @@ function updateRecentlyVisitedDropdown() {
         .slice(0, 5); // Get top 5 most recently visited links
 
       dropdownContent.innerHTML = '';
-      sortedLinks.forEach(([link, count]) => {
+      sortedLinks.forEach(([link, data]) => {
         const li = document.createElement('li');
         li.role = 'presentation';
         li.className = 'slds-dropdown__item uiMenuItem';
@@ -102,7 +102,7 @@ function updateRecentlyVisitedDropdown() {
         
         li.innerHTML = `
           <a role="menuitem" href="${fullUrl}" title="${fullUrl}">
-            <span class="uiOutputText">${displayText} (${count})</span>
+            <span class="uiOutputText">${displayText} (${data.count})</span>
           </a>
         `;
         dropdownContent.appendChild(li);
