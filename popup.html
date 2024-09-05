@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 10px;
+      font-family: Arial, sans-serif;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    a {
+      display: block;
+      margin-top: 10px;
+    }
+    #visitedLinks {
+      margin-top: 20px;
+    }
+    #visitedLinks h3 {
+      margin-bottom: 10px;
+    }
+    #visitedLinks ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <label>
+    <input type="checkbox" id="toggleBanner"> Show Banner
+  </label>
+  <label>
+    <input type="checkbox" id="toggleRecentlyVisited"> Show Recently Visited Menu
+  </label>
+  <div id="visitedLinks">
+    <h3>Recently Visited Links:</h3>
+    <ul id="visitedLinksList"></ul>
+  </div>
+  <a href="https://www.linkedin.com/in/noor-alam-shuvo/" target="_blank">Developer's LinkedIn</a>
+  <script src="popup.js"></script>
+</body>
+</html>

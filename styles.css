@@ -11,3 +11,36 @@
   font-weight: bold;
   z-index: 9999;
 }
+
+/* Add these new styles */
+.popupTargetContainer {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #d8dde6;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
+  z-index: 10000;
+  margin-top: 2px; /* Add a small gap between the menu and the dropdown */
+}
+
+.popupTargetContainer.slds-is-open {
+  display: block;
+}
+
+.popupTargetContainer .slds-dropdown__item > a {
+  display: block;
+  padding: 0.5rem;
+  color: #16325c;
+  text-decoration: none;
+}
+
+.popupTargetContainer .slds-dropdown__item > a:hover {
+  background-color: #f4f6f9;
+}
+
+/* Add this new rule */
+.oneConsoleTabItem {
+  position: relative;
+}
+

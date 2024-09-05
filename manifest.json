@@ -2,8 +2,11 @@
   "manifest_version": 3,
   "name": "Salesforce Banner",
   "version": "1.0",
-  "description": "Adds a thin banner to Salesforce tabs",
-  "permissions": ["activeTab"],
+  "description": "Adds a thin banner to Salesforce tabs and tracks recently visited setup pages",
+  "permissions": ["activeTab", "storage", "tabs"],
+  "action": {
+    "default_popup": "popup.html"
+  },
   "content_scripts": [
     {
       "matches": ["*://*.force.com/*"],
