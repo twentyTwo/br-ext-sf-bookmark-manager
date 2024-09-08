@@ -4,26 +4,67 @@ let showRecentlyVisited = true;
 let visitedLinks = {};
 
 function addSalesforceBanner() {
-  const banner = document.createElement('div');
-  banner.id = 'salesforce-banner';
-  
-  const url = window.location.href.toLowerCase();
-  
-  if (url.includes('sandbox') && url.includes('full')) {
-    banner.style.backgroundColor = 'orange';
-    banner.textContent = 'Salesforce Full Sandbox Org';
-  } else if (url.includes('sandbox')) {
-    banner.style.backgroundColor = 'green';
-    banner.textContent = 'Salesforce Sandbox Org';
-  } else {
-    banner.style.backgroundColor = 'darkred';
-    banner.textContent = 'Salesforce Production Org';
+  console.log('addSalesforceBanner called');
+
+  function setHeaderBackground() {
+    const headerElement = document.querySelector('span[role="navigation"].button-container-a11y[aria-label="Global Header"]');
+    
+    if (!headerElement) {
+      console.log('Header element not found, will retry');
+      return false;
+    }
+
+    console.log('Header element found, setting background color');
+    const url = window.location.href.toLowerCase();
+    
+    if (url.includes('sandbox') && url.includes('full')) {
+      headerElement.style.backgroundColor = 'orange';
+    } else if (url.includes('sandbox')) {
+      headerElement.style.backgroundColor = 'green';
+    } else if (url.includes('dev-ed')) {
+      headerElement.style.backgroundColor = 'blue';
+    } else {
+      headerElement.style.backgroundColor = 'darkred';
+    }
+
+    updateBannerVisibility();
+    return true;
   }
-  
-  document.body.insertBefore(banner, document.body.firstChild);
-  updateBannerVisibility();
+
+  // Try to set the background immediately
+  if (setHeaderBackground()) {
+    console.log('Background set successfully');
+    return;
+  }
+
+  // If immediate attempt fails, set up a MutationObserver
+  const observer = new MutationObserver((mutations, obs) => {
+    if (setHeaderBackground()) {
+      console.log('Background set successfully after DOM mutation');
+      obs.disconnect();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  console.log('MutationObserver started');
+
+  // Set up a timeout as a fallback
+  setTimeout(() => {
+    if (setHeaderBackground()) {
+      console.log('Background set successfully after timeout');
+      observer.disconnect();
+    } else {
+      console.error('Failed to set background color after timeout');
+      observer.disconnect();
+    }
+  }, 5000); // 5 second timeout
 
   // Add "Recently visited" menu item if on the specific page
+  const url = window.location.href.toLowerCase();
   if (url.includes('/setup/')) {
     console.log('Correct URL detected, calling addRecentlyVisitedMenuItem');
     addRecentlyVisitedMenuItem();
@@ -33,9 +74,23 @@ function addSalesforceBanner() {
 }
 
 function updateBannerVisibility() {
-  const banner = document.getElementById('salesforce-banner');
-  if (banner) {
-    banner.style.display = showBanner ? 'block' : 'none';
+  const headerElement = document.querySelector('span[role="navigation"].button-container-a11y[aria-label="Global Header"]');
+  if (headerElement) {
+    if (showBanner) {
+      // Set the background color based on the current URL
+      const url = window.location.href.toLowerCase();
+      if (url.includes('sandbox') && url.includes('full')) {
+        headerElement.style.backgroundColor = 'orange';
+      } else if (url.includes('sandbox')) {
+        headerElement.style.backgroundColor = 'green';
+      } else if (url.includes('dev-ed')) {
+        headerElement.style.backgroundColor = 'blue';
+      } else {
+        headerElement.style.backgroundColor = 'darkred';
+      }
+    } else {
+      headerElement.style.backgroundColor = ''; // This will reset to the original color
+    }
   }
 }
 
@@ -223,9 +278,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.storage.sync.get(['showBanner', 'showRecentlyVisited'], function(result) {
   showBanner = result.showBanner !== false;
   showRecentlyVisited = result.showRecentlyVisited !== false;
-  addSalesforceBanner();
+  
+  // Ensure the DOM is ready before calling addSalesforceBanner
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    addSalesforceBanner();
+  } else {
+    document.addEventListener('DOMContentLoaded', addSalesforceBanner);
+  }
+  
   trackVisitedLink();
-  updateRecentlyVisitedDropdown(); // Add this line
+  updateRecentlyVisitedDropdown();
 });
 
 // Add a listener for URL changes
@@ -234,9 +296,8 @@ new MutationObserver(() => {
   const url = location.href;
   if (url !== lastUrl) {
     lastUrl = url;
-    if (url.includes('/setup/')) {
-      trackVisitedLink();
-    }
+    console.log('URL changed, re-running addSalesforceBanner');
+    addSalesforceBanner();
   }
 }).observe(document, {subtree: true, childList: true});
 
