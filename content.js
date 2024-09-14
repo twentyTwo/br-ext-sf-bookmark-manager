@@ -14,16 +14,25 @@ function addSalesforceBanner() {
 
     console.log('Header element found, setting background color');
     const url = window.location.href.toLowerCase();
-    
-    if (url.includes('sandbox') && url.includes('full')) {
-      headerElement.style.backgroundColor = 'orange';
-    } else if (url.includes('sandbox')) {
-      headerElement.style.backgroundColor = 'green';
-    } else if (url.includes('dev-ed')) {
-      headerElement.style.backgroundColor = 'blue';
-    } else {
-      headerElement.style.backgroundColor = 'darkred';
-    }
+    const orgUrl = new URL(url).origin;
+
+    chrome.storage.local.get({orgColors: {}}, function(result) {
+      const orgColors = result.orgColors;
+      if (orgColors[orgUrl]) {
+        headerElement.style.backgroundColor = orgColors[orgUrl];
+      } else {
+        // Fallback to default colors if no custom color is set
+        if (url.includes('sandbox') && url.includes('full')) {
+          headerElement.style.backgroundColor = 'orange';
+        } else if (url.includes('sandbox')) {
+          headerElement.style.backgroundColor = 'green';
+        } else if (url.includes('dev-ed')) {
+          headerElement.style.backgroundColor = 'blue';
+        } else {
+          headerElement.style.backgroundColor = 'darkred';
+        }
+      }
+    });
 
     addBookmarkItem();
     return true;
@@ -258,17 +267,26 @@ function updateBannerVisibility() {
   const headerElement = document.querySelector('span[role="navigation"].button-container-a11y[aria-label="Global Header"]');
   if (headerElement) {
     if (showBanner) {
-      // Set the background color based on the current URL
       const url = window.location.href.toLowerCase();
-      if (url.includes('sandbox') && url.includes('full')) {
-        headerElement.style.backgroundColor = 'orange';
-      } else if (url.includes('sandbox')) {
-        headerElement.style.backgroundColor = 'green';
-      } else if (url.includes('dev-ed')) {
-        headerElement.style.backgroundColor = 'blue';
-      } else {
-        headerElement.style.backgroundColor = 'darkred';
-      }
+      const orgUrl = new URL(url).origin;
+
+      chrome.storage.local.get({orgColors: {}}, function(result) {
+        const orgColors = result.orgColors;
+        if (orgColors[orgUrl]) {
+          headerElement.style.backgroundColor = orgColors[orgUrl];
+        } else {
+          // Fallback to default colors if no custom color is set
+          if (url.includes('sandbox') && url.includes('full')) {
+            headerElement.style.backgroundColor = 'orange';
+          } else if (url.includes('sandbox')) {
+            headerElement.style.backgroundColor = 'green';
+          } else if (url.includes('dev-ed')) {
+            headerElement.style.backgroundColor = 'blue';
+          } else {
+            headerElement.style.backgroundColor = 'darkred';
+          }
+        }
+      });
     } else {
       headerElement.style.backgroundColor = ''; // This will reset to the original color
     }
