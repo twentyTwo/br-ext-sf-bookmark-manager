@@ -1,11 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
   const toggleBanner = document.getElementById('toggleBanner');
   const toggleBookmark = document.getElementById('toggleBookmark');
+  const hideSandboxBanner = document.getElementById('hideSandboxBanner');
   const resetBookmarks = document.getElementById('resetBookmarks');
 
-  chrome.storage.sync.get(['showBanner', 'showBookmark'], function(result) {
+  chrome.storage.sync.get(['showBanner', 'showBookmark', 'hideSandboxBanner'], function(result) {
     toggleBanner.checked = result.showBanner !== false;
     toggleBookmark.checked = result.showBookmark !== false;
+    hideSandboxBanner.checked = result.hideSandboxBanner === true;
   });
 
   toggleBanner.addEventListener('change', function() {
@@ -19,6 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.storage.sync.set({showBookmark: this.checked});
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       chrome.tabs.sendMessage(tabs[0].id, {action: "toggleBookmark", show: toggleBookmark.checked});
+    });
+  });
+
+  hideSandboxBanner.addEventListener('change', function() {
+    chrome.storage.sync.set({hideSandboxBanner: this.checked});
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {action: "hideSandboxBanner", hide: hideSandboxBanner.checked});
     });
   });
 

@@ -275,6 +275,14 @@ function updateBannerVisibility() {
   }
 }
 
+// Add this function to hide/show the sandbox banner
+function toggleSandboxBanner(hide) {
+  const sandboxBanner = document.querySelector('.slds-color__background_gray-1.slds-text-align_center.slds-size_full.slds-text-body_regular.oneSystemMessage');
+  if (sandboxBanner) {
+    sandboxBanner.style.display = hide ? 'none' : '';
+  }
+}
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request.action === "toggleBanner") {
     showBanner = request.show;
@@ -296,22 +304,28 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
     }
     console.log('Bookmarks have been reset');
+  } else if (request.action === "hideSandboxBanner") {
+    toggleSandboxBanner(request.hide);
   }
 });
 
-chrome.storage.sync.get(['showBanner', 'showBookmark'], function(result) {
+chrome.storage.sync.get(['showBanner', 'showBookmark', 'hideSandboxBanner'], function(result) {
   showBanner = result.showBanner !== false;
   showBookmark = result.showBookmark !== false;
   
   // Ensure the DOM is ready before calling addSalesforceBanner
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     addSalesforceBanner();
+    toggleSandboxBanner(result.hideSandboxBanner === true);
   } else {
-    document.addEventListener('DOMContentLoaded', addSalesforceBanner);
+    document.addEventListener('DOMContentLoaded', function() {
+      addSalesforceBanner();
+      toggleSandboxBanner(result.hideSandboxBanner === true);
+    });
   }
 });
 
-// Add a listener for URL changes
+// Update the URL change listener
 let lastUrl = location.href; 
 new MutationObserver(() => {
   const url = location.href;
@@ -319,7 +333,10 @@ new MutationObserver(() => {
     lastUrl = url;
     console.log('URL changed, re-running addSalesforceBanner');
     addSalesforceBanner();
-    addBookmarkItem(); // Updated this line
+    addBookmarkItem();
+    chrome.storage.sync.get(['hideSandboxBanner'], function(result) {
+      toggleSandboxBanner(result.hideSandboxBanner === true);
+    });
   }
 }).observe(document, {subtree: true, childList: true});
 
