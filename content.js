@@ -321,7 +321,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (bookmarkList) {
       bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
     }
-    console.log('Bookmarks have been reset');
+    console.log('Bookmarks for this org have been reset');
   } else if (request.action === "hideSandboxBanner") {
     toggleSandboxBanner(request.hide);
   }
@@ -380,5 +380,5 @@ function showConfirmationMessage(message) {
     setTimeout(() => {
       confirmationMessage.remove();
     }, 300); // Wait for the fade-out transition to complete before removing
-  }, 3000);
+  }, 1500);
 }

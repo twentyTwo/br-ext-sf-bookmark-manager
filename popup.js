@@ -62,12 +62,20 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   resetBookmarks.addEventListener('click', function() {
-    if (confirm('Are you sure you want to reset all bookmarks? This action cannot be undone.')) {
-      chrome.storage.local.set({bookmarks: []}, function() {
-        console.log('All bookmarks have been reset');
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, {action: "resetBookmarks"});
-        });
+    if (confirm('Are you sure you want to reset bookmarks for this org? This action cannot be undone.')) {
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs[0] && tabs[0].url) {
+          const url = new URL(tabs[0].url);
+          const orgUrl = url.origin;
+          chrome.storage.local.get({bookmarks: []}, function(result) {
+            let bookmarks = result.bookmarks;
+            bookmarks = bookmarks.filter(bookmark => bookmark.orgUrl !== orgUrl);
+            chrome.storage.local.set({bookmarks: bookmarks}, function() {
+              console.log('Bookmarks for this org have been reset');
+              chrome.tabs.sendMessage(tabs[0].id, {action: "resetBookmarks", orgUrl: orgUrl});
+            });
+          });
+        }
       });
     }
   });

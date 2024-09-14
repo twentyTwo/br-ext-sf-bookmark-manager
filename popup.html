@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Salesforce Org Manager</title>
+  <title>Salesforce Bookmark Manager</title>
   <style>
     body {
       width: 250px;
@@ -125,10 +125,26 @@
     .hidden {
       display: none;
     }
+    .reset-button {
+      background-color: #f8f9fa;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .reset-button:hover {
+      background-color: #dc3545;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
-  <div class="header">Salesforce Org Manager</div>
+  <div class="header">Salesforce Bookmark Manager</div>
   <div id="mainOptions">
     <div class="option">
       <label class="toggle">
@@ -152,7 +168,7 @@
       </label>
       <label for="hideSandboxBanner">Hide Sandbox Banner</label>
     </div>
-    <button id="resetBookmarks">Reset All Bookmarks</button>
+    <button id="resetBookmarks" class="reset-button">Reset Org Bookmarks</button>
   </div>
   <div class="color-picker" id="colorPicker" style="margin-top: 15px; padding: 10px; border: 1px solid #d8dde6; border-radius: 0.25rem;">
     <input type="text" id="orgUrl" placeholder="Enter Salesforce Org URL" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 0.25rem;">
