@@ -1,39 +1,183 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salesforce Bookmark Manager</title>
   <style>
     body {
-      width: 300px;
-      padding: 10px;
+      width: 250px;
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background-color: #f9f9f9;
+      color: #333;
     }
-    label {
+    .header {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .option label {
+      margin-left: 8px;
+      font-size: 14px;
+    }
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #0070d2;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    .setup-icon {
+      cursor: pointer;
+      margin-left: 5px;
+      font-size: 14px;
+    }
+    .color-picker {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .color-picker.show {
       display: block;
+    }
+    .color-options {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
       margin-bottom: 10px;
     }
-    a {
-      display: block;
+    .color-option {
+      width: 100%;
+      padding-bottom: 100%;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+    #saveOrgColor {
+      background-color: #0070d2;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    #saveOrgColor:hover {
+      background-color: #005fb2;
+    }
+    #resetBookmarks {
+      background-color: #ffcccb;
+      color: #333;
+    }
+    #resetBookmarks:hover {
+      background-color: #ffb3b3;
+    }
+    .footer {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 12px;
+    }
+    .footer a {
+      color: #0070d2;
+      text-decoration: none;
+    }
+    .hidden {
+      display: none;
+    }
+    .reset-button {
+      background-color: #f8f9fa;
+      color: #dc3545;
+      border: 1px solid #dc3545;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      width: 100%;
       margin-top: 10px;
     }
-    #visitedLinks {
-      margin-top: 20px;
-    }
-    #visitedLinks h3 {
-      margin-bottom: 10px;
-    }
-    #visitedLinks ul {
-      padding-left: 20px;
+    .reset-button:hover {
+      background-color: #dc3545;
+      color: #ffffff;
     }
   </style>
 </head>
 <body>
-  <label>
-    <input type="checkbox" id="toggleBanner"> Show Banner
-  </label>
-  <label>
-    <input type="checkbox" id="toggleRecentlyVisited"> Show Recently Visited Menu
-  </label>
-  <a href="https://www.linkedin.com/in/noor-alam-shuvo/" target="_blank">Developer's LinkedIn</a>
+  <div class="header">Salesforce Bookmark Manager</div>
+  <div id="mainOptions">
+    <div class="option">
+      <label class="toggle">
+        <input type="checkbox" id="toggleBanner">
+        <span class="slider"></span>
+      </label>
+      <label for="toggleBanner">Label Color to Org</label>
+      <span class="setup-icon" id="setupIcon">⚙️</span>
+    </div>
+    <div class="option">
+      <label class="toggle">
+        <input type="checkbox" id="toggleBookmark">
+        <span class="slider"></span>
+      </label>
+      <label for="toggleBookmark">Show Bookmark Item</label>
+    </div>
+    <div class="option">
+      <label class="toggle">
+        <input type="checkbox" id="hideSandboxBanner">
+        <span class="slider"></span>
+      </label>
+      <label for="hideSandboxBanner">Hide Sandbox Banner</label>
+    </div>
+    <button id="resetBookmarks" class="reset-button">Reset Org Bookmarks</button>
+  </div>
+  <div class="color-picker" id="colorPicker" style="margin-top: 15px; padding: 10px; border: 1px solid #d8dde6; border-radius: 0.25rem;">
+    <input type="text" id="orgUrl" placeholder="Enter Salesforce Org URL" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 0.25rem;">
+    <div class="color-options" id="colorOptions" style="margin-bottom: 10px;"></div>
+    <button id="saveOrgColor" style="padding: 5px 10px; font-size: 0.8rem; background-color: #0070d2; color: white; border: none; border-radius: 0.25rem;">Save Org Color</button>
+  </div>
+  <div class="footer">
+    <a href="https://www.linkedin.com/in/noor-alam-shuvo/" target="_blank">Developer's LinkedIn</a>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

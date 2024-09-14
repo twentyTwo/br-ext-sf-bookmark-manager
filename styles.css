@@ -44,3 +44,128 @@
   position: relative;
 }
 
+.bookmark-panel {
+  z-index: 9999;
+  font-family: Arial, sans-serif;
+}
+
+.bookmark-panel .panel-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#bookmarkList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.bookmark-item:last-child {
+  border-bottom: none;
+}
+
+.bookmark-link {
+  flex-grow: 1;
+  color: #0070d2;
+  text-decoration: none;
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookmark-title {
+  outline: none;
+  padding: 2px;
+  border-radius: 2px;
+}
+
+.bookmark-title:focus {
+  background-color: #ffffff;
+  box-shadow: 0 0 0 1px #0070d2;
+}
+
+.bookmark-actions {
+  display: flex;
+  align-items: center;
+}
+
+.edit-bookmark,
+.remove-bookmark {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.edit-bookmark {
+  color: #0070d2;
+}
+
+.remove-bookmark {
+  color: #c23934;
+  font-size: 1.2em;
+}
+
+.bookmark-item:hover .edit-bookmark,
+.bookmark-item:hover .remove-bookmark {
+  opacity: 1;
+}
+
+.no-bookmarks {
+  padding: 8px;
+  color: #706e6b;
+  font-style: italic;
+}
+
+.sf-extension-confirmation-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sf-extension-confirmation-message.show {
+  opacity: 1;
+}
+
+.bookmark-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #d8dde6;
+}
+
+.bookmark-panel .add-bookmark-btn {
+  font-size: 0.8rem;
+  padding: 0 0.5rem;
+}
+
+.bookmark-panel .close-btn {
+  margin-left: 0.5rem;
+}
+
+.bookmark-panel .close-btn:hover {
+  background-color: #f3f3f3;
+}
+
