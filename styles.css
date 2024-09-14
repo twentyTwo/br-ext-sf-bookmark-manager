@@ -44,3 +44,47 @@
   position: relative;
 }
 
+.bookmark-panel {
+  z-index: 9999;
+  font-family: Arial, sans-serif;
+}
+
+.bookmark-panel .close-btn:hover,
+.bookmark-panel .add-bookmark-btn:hover {
+  background-color: #f3f3f3;
+}
+
+.bookmark-panel .panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bookmark-panel .panel-content::-webkit-scrollbar-thumb {
+  background-color: #d8dde6;
+  border-radius: 3px;
+}
+
+.bookmark-panel .slds-button_icon-border-filled {
+  border-color: #d8dde6;
+}
+
+.bookmark-panel .slds-button_icon-border-filled:hover {
+  background-color: #f3f3f3;
+}
+
+.bookmark-panel #bookmarkList li:last-child {
+  border-bottom: none;
+}
+
+.bookmark-panel #bookmarkList li:hover {
+  background-color: #f3f3f3;
+}
+
+.bookmark-panel .remove-bookmark {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.bookmark-panel #bookmarkList li:hover .remove-bookmark {
+  opacity: 1;
+}
+
