@@ -172,20 +172,69 @@ function displayBookmarks() {
     const bookmarks = result.bookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
     
     if (bookmarks.length === 0) {
-      bookmarkList.innerHTML = '<li style="padding: 0.5rem;">No bookmarks for this org yet.</li>';
+      bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
     } else {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
-        <li style="padding: 0.5rem; border-bottom: 1px solid #d8dde6;">
-          <a href="${bookmark.url}" style="color: #0070d2; text-decoration: none; display: block; margin-right: 20px;">${bookmark.title}</a>
-          <button class="remove-bookmark" data-url="${bookmark.url}" style="background: none; border: none; color: #c23934; cursor: pointer; float: right; margin-top: -20px;">×</button>
+        <li class="bookmark-item">
+          <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.url}">
+            <span class="bookmark-title">${bookmark.title}</span>
+          </a>
+          <div class="bookmark-actions">
+            <button class="edit-bookmark" data-url="${bookmark.url}" title="Edit bookmark">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#0070d2"/>
+              </svg>
+            </button>
+            <button class="remove-bookmark" data-url="${bookmark.url}" title="Remove bookmark">×</button>
+          </div>
         </li>
       `).join('');
 
       // Add event listeners for remove buttons
       document.querySelectorAll('.remove-bookmark').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
           removeBookmark(this.dataset.url);
         });
+      });
+
+      // Add event listeners for edit buttons
+      document.querySelectorAll('.edit-bookmark').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          const bookmarkItem = this.closest('.bookmark-item');
+          const titleSpan = bookmarkItem.querySelector('.bookmark-title');
+          titleSpan.contentEditable = true;
+          titleSpan.focus();
+        });
+      });
+
+      // Add event listeners for editable titles
+      document.querySelectorAll('.bookmark-title').forEach(titleSpan => {
+        titleSpan.addEventListener('blur', function() {
+          this.contentEditable = false;
+          updateBookmarkTitle(this.textContent, this.closest('.bookmark-link').href);
+        });
+        titleSpan.addEventListener('keydown', function(event) {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            this.blur();
+          }
+        });
+      });
+    }
+  });
+}
+
+function updateBookmarkTitle(newTitle, url) {
+  chrome.storage.local.get({bookmarks: []}, function(result) {
+    let bookmarks = result.bookmarks;
+    const bookmarkIndex = bookmarks.findIndex(bookmark => bookmark.url === url);
+    if (bookmarkIndex !== -1) {
+      bookmarks[bookmarkIndex].title = newTitle;
+      chrome.storage.local.set({bookmarks: bookmarks}, function() {
+        console.log('Bookmark title updated');
       });
     }
   });
