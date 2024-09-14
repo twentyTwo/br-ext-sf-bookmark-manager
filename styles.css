@@ -128,3 +128,44 @@
   font-style: italic;
 }
 
+.sf-extension-confirmation-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sf-extension-confirmation-message.show {
+  opacity: 1;
+}
+
+.bookmark-panel .panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #d8dde6;
+}
+
+.bookmark-panel .add-bookmark-btn {
+  font-size: 0.8rem;
+  padding: 0 0.5rem;
+}
+
+.bookmark-panel .close-btn {
+  margin-left: 0.5rem;
+}
+
+.bookmark-panel .close-btn:hover {
+  background-color: #f3f3f3;
+}
+

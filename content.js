@@ -67,6 +67,7 @@ function addBookmarkItem() {
 
   const notificationIcon = document.querySelector('.slds-global-actions__item_notification');
   if (notificationIcon && !document.querySelector('.custom-bookmark-item')) {
+    
     const bookmarkItemHtml = `
       <li class="slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click custom-bookmark-item" style="position: relative; top: -2px;">
         <div class="forceHeaderButton">
@@ -108,21 +109,17 @@ function toggleBookmarkPanel() {
 
 function createBookmarkPanel() {
   const panelHtml = `
-    <div class="bookmark-panel container" style="position: absolute; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);">
+    <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999;">
       <div class="panel-header" style="padding: 0.5rem; border-bottom: 1px solid #d8dde6; display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 1rem; font-weight: bold;">Bookmarks</h2>
-        <div>
-          <button type="button" class="add-bookmark-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Add Bookmark" title="Add Bookmark">
-            <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52">
-              <path d="M30 29h16.5c.8 0 1.5.7 1.5 1.5v3c0 .8-.7 1.5-1.5 1.5H30v16.5c0 .8-.7 1.5-1.5 1.5h-3c-.8 0-1.5-.7-1.5-1.5V35H7.5c-.8 0-1.5-.7-1.5-1.5v-3c0-.8.7-1.5 1.5-1.5H24V12.5c0-.8.7-1.5 1.5-1.5h3c.8 0 1.5.7 1.5 1.5V29z"/>
-            </svg>
-          </button>
-          <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close">
-            <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52">
-              <path d="M31 25.4l13-13.1c.6-.6.6-1.5 0-2.1l-2-2.1c-.6-.6-1.5-.6-2.1 0L26.8 21.2c-.4.4-1 .4-1.4 0L12.3 8c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8 39.9c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L25.3 31c.4-.4.4-1 0-1.4z"/>
-            </svg>
-          </button>
-        </div>
+        <button type="button" class="add-bookmark-btn slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0 0.5rem;">
+          Bookmark this page
+        </button>
+        <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="margin-left: 0.5rem;">
+          <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52" width="14" height="14">
+            <path fill="#706e6b" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
+          </svg>
+          <span class="slds-assistive-text">Close</span>
+        </button>
       </div>
       <div class="panel-content scrollable" style="max-height: 300px; overflow-y: auto; padding: 0.5rem;">
         <ul id="bookmarkList" style="list-style-type: none; padding: 0; margin: 0;"></ul>
@@ -157,9 +154,11 @@ function addCurrentPageBookmark() {
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark added');
         displayBookmarks();
+        showConfirmationMessage('Bookmark added successfully');
       });
     } else {
       console.log('Bookmark already exists');
+      showConfirmationMessage('Bookmark already exists');
     }
   });
 }
@@ -185,7 +184,11 @@ function displayBookmarks() {
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#0070d2"/>
               </svg>
             </button>
-            <button class="remove-bookmark" data-url="${bookmark.url}" title="Remove bookmark">×</button>
+            <button class="remove-bookmark" data-url="${bookmark.url}" title="Remove bookmark">
+              <svg width="12" height="12" viewBox="0 0 52 52">
+                <path fill="#c23934" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
+              </svg>
+            </button>
           </div>
         </li>
       `).join('');
@@ -286,6 +289,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         bookmarkItem.remove();
       }
     }
+  } else if (request.action === "resetBookmarks") {
+    // Clear the bookmarks in the panel if it's open
+    const bookmarkList = document.getElementById('bookmarkList');
+    if (bookmarkList) {
+      bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
+    }
+    console.log('Bookmarks have been reset');
   }
 });
 
@@ -316,4 +326,24 @@ new MutationObserver(() => {
 function getCurrentOrgUrl() {
   const url = new URL(window.location.href);
   return url.origin; // This will return the full org URL (e.g., https://myorg.my.salesforce.com)
+}
+
+function showConfirmationMessage(message) {
+  const confirmationMessage = document.createElement('div');
+  confirmationMessage.className = 'sf-extension-confirmation-message';
+  confirmationMessage.textContent = message;
+  document.body.appendChild(confirmationMessage);
+
+  // Force a reflow to trigger the transition
+  confirmationMessage.offsetHeight;
+
+  // Add the 'show' class to trigger the fade-in
+  confirmationMessage.classList.add('show');
+
+  setTimeout(() => {
+    confirmationMessage.classList.remove('show');
+    setTimeout(() => {
+      confirmationMessage.remove();
+    }, 300); // Wait for the fade-out transition to complete before removing
+  }, 3000);
 }
