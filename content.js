@@ -119,7 +119,7 @@ function createBookmarkPanel() {
           </button>
           <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close">
             <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52">
-              <path d="M31 25.4l13-13.1c.6-.6.6-1.5 0-2.1l-2-2.1c-.6-.6-1.5-.6-2.1 0L26.8 21.2c-.4.4-1 .4-1.4 0L12.3 8c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8 39.9c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L25.3 31c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31 26.8c-.4-.4-.4-1 0-1.4z"/>
+              <path d="M31 25.4l13-13.1c.6-.6.6-1.5 0-2.1l-2-2.1c-.6-.6-1.5-.6-2.1 0L26.8 21.2c-.4.4-1 .4-1.4 0L12.3 8c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8 39.9c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L25.3 31c.4-.4.4-1 0-1.4z"/>
             </svg>
           </button>
         </div>
@@ -148,11 +148,12 @@ function createBookmarkPanel() {
 function addCurrentPageBookmark() {
   const url = window.location.href;
   const title = document.title;
+  const orgUrl = getCurrentOrgUrl();
   
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let bookmarks = result.bookmarks;
     if (!bookmarks.some(bookmark => bookmark.url === url)) {
-      bookmarks.push({url, title});
+      bookmarks.push({url, title, orgUrl});
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark added');
         displayBookmarks();
@@ -165,34 +166,35 @@ function addCurrentPageBookmark() {
 
 function displayBookmarks() {
   const bookmarkList = document.getElementById('bookmarkList');
+  const currentOrgUrl = getCurrentOrgUrl();
   
   chrome.storage.local.get({bookmarks: []}, function(result) {
-    const bookmarks = result.bookmarks;
+    const bookmarks = result.bookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
     
     if (bookmarks.length === 0) {
-      bookmarkList.innerHTML = '<li style="padding: 0.5rem;">No bookmarks yet.</li>';
+      bookmarkList.innerHTML = '<li style="padding: 0.5rem;">No bookmarks for this org yet.</li>';
     } else {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
         <li style="padding: 0.5rem; border-bottom: 1px solid #d8dde6;">
           <a href="${bookmark.url}" style="color: #0070d2; text-decoration: none; display: block; margin-right: 20px;">${bookmark.title}</a>
-          <button class="remove-bookmark" data-index="${index}" style="background: none; border: none; color: #c23934; cursor: pointer; float: right; margin-top: -20px;">×</button>
+          <button class="remove-bookmark" data-url="${bookmark.url}" style="background: none; border: none; color: #c23934; cursor: pointer; float: right; margin-top: -20px;">×</button>
         </li>
       `).join('');
 
       // Add event listeners for remove buttons
       document.querySelectorAll('.remove-bookmark').forEach(button => {
         button.addEventListener('click', function() {
-          removeBookmark(parseInt(this.dataset.index));
+          removeBookmark(this.dataset.url);
         });
       });
     }
   });
 }
 
-function removeBookmark(index) {
+function removeBookmark(url) {
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let bookmarks = result.bookmarks;
-    bookmarks.splice(index, 1);
+    bookmarks = bookmarks.filter(bookmark => bookmark.url !== url);
     chrome.storage.local.set({bookmarks: bookmarks}, function() {
       console.log('Bookmark removed');
       displayBookmarks();
@@ -261,3 +263,8 @@ new MutationObserver(() => {
     addBookmarkItem(); // Updated this line
   }
 }).observe(document, {subtree: true, childList: true});
+
+function getCurrentOrgUrl() {
+  const url = new URL(window.location.href);
+  return url.origin; // This will return the full org URL (e.g., https://myorg.my.salesforce.com)
+}
