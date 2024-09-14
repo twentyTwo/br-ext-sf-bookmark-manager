@@ -184,7 +184,7 @@ function displayBookmarks() {
     } else {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
         <li class="bookmark-item">
-          <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.url}">
+          <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.url}" target="_blank">
             <span class="bookmark-title">${bookmark.title}</span>
           </a>
           <div class="bookmark-actions">
