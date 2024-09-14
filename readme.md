@@ -1,4 +1,4 @@
-# Salesforce Bookmark Manager
+# Salesforce Bookmark Manager Browser Extension
 
 Salesforce Org Manager streamlines your multi-org Salesforce experience with powerful visual and organizational tools. Effortlessly distinguish between orgs using custom color-coded headers, bookmark frequently visited pages, and create a clutter-free workspace by hiding sandbox banners.
 
