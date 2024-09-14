@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const mainOptions = document.getElementById('mainOptions');
 
   const colors = [
-    '#1589EE', '#0070D2', '#00396B', '#21B67C', '#1B5297',
-    '#2A2A2A', '#4A4A4A', '#6A6A6A', '#8A8A8A', '#A8A8A8',
-    '#C23934', '#FF9A3C', '#FFB75D', '#FFC022', '#54698D',
-    '#5867E8', '#BF5A00', '#0C8450', '#0176D3', '#014486'
+    '#2C3E50', '#34495E', '#1ABC9C', '#16A085', '#2980B9',
+    '#3498DB', '#E74C3C', '#C0392B', '#8E44AD', '#9B59B6',
+    '#2ECC71', '#27AE60', '#F39C12', '#E67E22', '#BDC3C7',
+    '#7F8C8D', '#ECF0F1', '#95A5A6', '#F1C40F', '#D35400'
   ];
+  
 
   let selectedColor = '';
 
