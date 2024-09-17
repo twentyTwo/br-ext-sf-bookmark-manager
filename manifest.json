@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Salesforce Bookmark Manager",
   "version": "1.0",
-  "description": "Salesforce Org Manager streamlines your multi-org Salesforce experience with powerful visual and organizational tools. Effortlessly distinguish between orgs using custom color-coded headers, bookmark frequently visited orgs, and create a clutter-free workspace by hiding sandbox banners.",
+  "description": "Manage multiple Salesforce orgs with custom headers, bookmarks, and sandbox banner controls for improved organization.",
   "permissions": ["activeTab", "storage", "tabs"],
   "action": {
     "default_popup": "popup.html"
