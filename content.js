@@ -1,5 +1,6 @@
 let showBanner = true;
 let showBookmark = true;
+let hideBannerState = {};
 
 function addSalesforceBanner() {
   console.log('addSalesforceBanner called');
@@ -293,12 +294,61 @@ function updateBannerVisibility() {
   }
 }
 
-// Add this function to hide/show the sandbox banner
-function toggleSandboxBanner(hide) {
+function hideSandboxBanner() {
+  console.log('Attempting to hide sandbox banner');
   const sandboxBanner = document.querySelector('.slds-color__background_gray-1.slds-text-align_center.slds-size_full.slds-text-body_regular.oneSystemMessage');
   if (sandboxBanner) {
-    sandboxBanner.style.display = hide ? 'none' : '';
+    sandboxBanner.style.display = 'none';
+    console.log('Sandbox banner hidden');
+    return true;
+  } else {
+    console.log('Sandbox banner not found, will retry');
+    return false;
   }
+}
+
+function setupSandboxBannerObserver() {
+  console.log('Setting up sandbox banner observer');
+  const observer = new MutationObserver((mutations, obs) => {
+    if (hideSandboxBanner()) {
+      console.log('Sandbox banner hidden after DOM mutation');
+      obs.disconnect();
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  // Set up a timeout as a fallback
+  setTimeout(() => {
+    if (hideSandboxBanner()) {
+      console.log('Sandbox banner hidden after timeout');
+      observer.disconnect();
+    } else {
+      console.error('Failed to hide sandbox banner after timeout');
+      observer.disconnect();
+    }
+  }, 5000); // 5 second timeout
+}
+
+function unhideSandboxBanner() {
+  console.log('Attempting to unhide sandbox banner');
+  const sandboxBanner = document.querySelector('.slds-color__background_gray-1.slds-text-align_center.slds-size_full.slds-text-body_regular.oneSystemMessage');
+  if (sandboxBanner) {
+    sandboxBanner.style.display = '';
+    console.log('Sandbox banner unhidden');
+  } else {
+    console.log('Sandbox banner not found for unhiding');
+  }
+}
+
+function saveHideBannerState(orgUrl, hide) {
+  hideBannerState[orgUrl] = hide;
+  chrome.storage.local.set({ hideBannerState: hideBannerState }, function() {
+    console.log(`Hide banner state saved for ${orgUrl}: ${hide}`);
+  });
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -323,24 +373,40 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     }
     console.log('Bookmarks for this org have been reset');
   } else if (request.action === "hideSandboxBanner") {
-    toggleSandboxBanner(request.hide);
+    const currentOrgUrl = getCurrentOrgUrl();
+    console.log(`Received hideSandboxBanner request for ${currentOrgUrl}: ${request.hide}`);
+    if (request.hide) {
+      setupSandboxBannerObserver();
+    } else {
+      unhideSandboxBanner();
+    }
+    saveHideBannerState(currentOrgUrl, request.hide);
   }
 });
 
-chrome.storage.sync.get(['showBanner', 'showBookmark', 'hideSandboxBanner'], function(result) {
+chrome.storage.sync.get(['showBanner', 'showBookmark'], function(result) {
   showBanner = result.showBanner !== false;
   showBookmark = result.showBookmark !== false;
   
-  // Ensure the DOM is ready before calling addSalesforceBanner
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    addSalesforceBanner();
-    toggleSandboxBanner(result.hideSandboxBanner === true);
-  } else {
-    document.addEventListener('DOMContentLoaded', function() {
+  chrome.storage.local.get({ hideBannerState: {} }, function(localResult) {
+    hideBannerState = localResult.hideBannerState;
+    const currentOrgUrl = getCurrentOrgUrl();
+    console.log(`Initial hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
       addSalesforceBanner();
-      toggleSandboxBanner(result.hideSandboxBanner === true);
-    });
-  }
+      if (hideBannerState[currentOrgUrl]) {
+        setupSandboxBannerObserver();
+      }
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        addSalesforceBanner();
+        if (hideBannerState[currentOrgUrl]) {
+          setupSandboxBannerObserver();
+        }
+      });
+    }
+  });
 });
 
 // Update the URL change listener
@@ -352,9 +418,13 @@ new MutationObserver(() => {
     console.log('URL changed, re-running addSalesforceBanner');
     addSalesforceBanner();
     addBookmarkItem();
-    chrome.storage.sync.get(['hideSandboxBanner'], function(result) {
-      toggleSandboxBanner(result.hideSandboxBanner === true);
-    });
+    const currentOrgUrl = getCurrentOrgUrl();
+    console.log(`Checking hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
+    if (hideBannerState[currentOrgUrl]) {
+      setupSandboxBannerObserver();
+    } else {
+      unhideSandboxBanner();
+    }
   }
 }).observe(document, {subtree: true, childList: true});
 

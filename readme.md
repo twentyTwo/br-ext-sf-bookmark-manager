@@ -2,6 +2,9 @@
 
 Salesforce Bookmark Manager streamlines your multi-org Salesforce experience with powerful visual and organizational tools. Effortlessly distinguish between orgs using custom color-coded headers, bookmark frequently visited pages, and create a clutter-free workspace by hiding sandbox banners.
 
+## Features
+
+
 ## Installation
 
 1. Clone the repository or download the ZIP file.

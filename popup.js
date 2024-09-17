@@ -55,10 +55,11 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   hideSandboxBanner.addEventListener('change', function() {
-    chrome.storage.local.set({hideSandboxBanner: this.checked});
+    const hide = this.checked;
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {action: "hideSandboxBanner", hide: hideSandboxBanner.checked});
+      chrome.tabs.sendMessage(tabs[0].id, {action: "hideSandboxBanner", hide: hide});
     });
+    chrome.storage.sync.set({hideSandboxBanner: hide});
   });
 
   resetBookmarks.addEventListener('click', function() {
@@ -124,5 +125,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       });
     }
+  });
+
+  // Load saved state
+  chrome.storage.sync.get(['hideSandboxBanner'], function(result) {
+    document.getElementById('hideSandboxBanner').checked = result.hideSandboxBanner === true;
   });
 });
