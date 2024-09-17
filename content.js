@@ -330,7 +330,7 @@ function setupSandboxBannerObserver() {
       console.error('Failed to hide sandbox banner after timeout');
       observer.disconnect();
     }
-  }, 5000); // 5 second timeout
+  }, 750); // 
 }
 
 function unhideSandboxBanner() {
