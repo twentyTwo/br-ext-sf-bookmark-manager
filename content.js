@@ -84,7 +84,7 @@ function addBookmarkItem() {
           <button aria-expanded="false" aria-haspopup="true" type="button" class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__item-action">
             <div class="tooltipTrigger tooltip-trigger uiTooltip">
               <lightning-icon class="slds-button__icon slds-global-header__icon">
-                <svg focusable="false" data-key="bookmark" aria-hidden="true" viewBox="0 0 18.46 18.46" class="slds-icon slds-icon_x-small" style="fill: #808080; height: 16px;">
+                <svg focusable="false" data-key="bookmark" aria-hidden="true" viewBox="0 0 18.46 18.46" class="slds-icon slds-icon_x-small" style="fill: #919191; height: 17px;">
                   <path d="M13.845 18.46l-4.615-4.615c-.215-.215-.565-.215-.78 0L3.845 18.46c-.43.43-1.165.125-1.165-.48V1.845C2.68 1.125 3.265.54 3.985.54h10.49c.72 0 1.305.585 1.305 1.305v16.135c0 .605-.735.91-1.165.48z"></path>
                 </svg>
               </lightning-icon>
