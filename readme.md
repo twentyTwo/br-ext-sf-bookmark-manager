@@ -1,45 +1,68 @@
-# Salesforce Bookmark Manager Browser Extension
+# Salesforce Banner Extension
 
-Salesforce Bookmark Manager streamlines your multi-org Salesforce experience with powerful visual and organizational tools. Effortlessly distinguish between orgs using custom color-coded headers, bookmark frequently visited pages, and create a clutter-free workspace by hiding sandbox banners.
+## Overview
+This Chrome/edge extension enhances the Salesforce interface by adding a customizable banner, bookmark functionality, and sandbox banner management.
 
-## Features
+## Key Features
 
+1. **Customizable Banner**
+   - Adds a colored banner to the Salesforce header
+   - Colors indicate environment type (sandbox, dev, production)
+   - Supports custom colors for specific org URLs
+
+2. **Bookmark Functionality**
+   - Adds a bookmark icon to the Salesforce header
+   - Allows users to save and manage bookmarks for the current org
+   - Bookmarks are displayed in a panel and can be edited or removed
+
+3. **Sandbox Banner Management**
+   - Option to hide/show the default Salesforce sandbox banner
+
+## Technical Documentation
+
+### Main Functions
+
+- `addSalesforceBanner()`: Adds the custom banner to the Salesforce header
+- `addBookmarkItem()`: Adds the bookmark icon to the header
+- `createBookmarkPanel()`: Creates and displays the bookmark management panel
+- `addCurrentPageBookmark()`: Saves the current page as a bookmark
+- `displayBookmarks()`: Shows saved bookmarks in the panel
+- `updateBannerVisibility()`: Toggles the visibility of the custom banner
+- `hideSandboxBanner()`: Hides the default Salesforce sandbox banner
+- `setupSandboxBannerObserver()`: Sets up an observer to hide the sandbox banner
+
+### Storage
+
+- Uses Chrome's storage API for persisting settings and bookmarks
+- Synced storage for global settings
+- Local storage for org-specific data (bookmarks, colors, banner visibility)
+
+### Event Handling
+
+- Listens for messages from the extension's popup for toggling features
+- Observes URL changes to update the banner and bookmarks accordingly
+
+### User Interface
+
+- Custom banner in the Salesforce header
+- Bookmark icon in the header
+- Bookmark management panel
+- Confirmation messages for user actions
 
 ## Installation
 
-1. Clone the repository or download the ZIP file.
-2. Open Chrome and navigate to `chrome://extensions/` or for edge navigate to `edge://extensions/`.
-3. Enable "Developer mode" by toggling the switch in the top right corner.
-4. Click on "Load unpacked" and select the directory where you cloned/downloaded the repository.
+1. Clone this repository or download the source code
+2. Open Chrome and navigate to `chrome://extensions`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked" and select the directory containing the extension files
 
 ## Usage
 
-1. After installing the extension, click on the extension icon in the Chrome / Edge toolbar.
-2. Use the popup to manage your Salesforce org bookmarks.
-3. Customize the headers of different orgs with color codes for easy identification.
-4. Hide sandbox banners to create a clutter-free workspace.
-
-## Permissions
-
-This extension requires the following permissions:
-- `activeTab`: To interact with the currently active tab.
-- `storage`: To store user preferences and bookmarks.
-- `tabs`: To manage and organize tabs.
-
-## Files
-
-- `manifest.json`: The configuration file for the Chrome extension.
-- `popup.html`: The HTML file for the extension's popup interface.
-- `styles.css`: The CSS file for styling the content scripts.
-- `content.js`: The JavaScript file for the content scripts.
+After installation, the extension will automatically activate on Salesforce domains. Use the extension popup to toggle features and customize settings.
 
 ## Contributing
 
-1. Fork the repository.
-2. Create a new branch from `develop` (`git checkout -b feature-branch`).
-3. Make your changes and commit them (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
