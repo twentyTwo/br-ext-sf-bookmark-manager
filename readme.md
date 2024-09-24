@@ -1,4 +1,4 @@
-# Salesforce Banner Extension
+# Salesforce Bookmark Manager
 
 ## Overview
 This Chrome/edge extension enhances the Salesforce interface by adding a customizable banner, bookmark functionality, and sandbox banner management.
