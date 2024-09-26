@@ -231,7 +231,7 @@ function displayBookmarks() {
         });
         titleSpan.addEventListener('keydown', function(event) {
           if (event.key === 'Enter') {
-            event.preventDefault();
+            event.preventDefault(); 
             this.blur();
           }
         });
