@@ -149,16 +149,33 @@ document.addEventListener('DOMContentLoaded', function() {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
             document.getElementById('orgName').textContent = "Unable to fetch org name";
+            updateSandboxOption(false);
           } else if (response && response.orgName) {
             document.getElementById('orgName').textContent = response.orgName;
+            updateSandboxOption(tabs[0].url.toLowerCase().includes('sandbox'));
           } else {
             document.getElementById('orgName').textContent = "Unknown org";
+            updateSandboxOption(false);
           }
         });
       } else {
         document.getElementById('orgName').textContent = "Not a Salesforce org";
+        updateSandboxOption(false);
       }
     });
+  }
+
+  function updateSandboxOption(isSandbox) {
+    const sandboxOption = document.querySelector('.sandbox-option');
+    if (isSandbox) {
+      sandboxOption.classList.remove('fade-out');
+      hideSandboxBanner.disabled = false;
+    } else {
+      sandboxOption.classList.add('fade-out');
+      hideSandboxBanner.checked = false;
+      hideSandboxBanner.disabled = true;
+      chrome.storage.sync.set({hideSandboxBanner: false});
+    }
   }
 
   // Call updateOrgName immediately when the popup opens

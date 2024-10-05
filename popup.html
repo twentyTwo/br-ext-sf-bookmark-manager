@@ -148,6 +148,10 @@
     .hidden {
       display: none;
     }
+    .sandbox-option.fade-out {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -169,7 +173,7 @@
       </label>
       <label for="toggleBookmark">Show Bookmark Icon</label>
     </div>
-    <div class="option">
+    <div class="option sandbox-option">
       <label class="toggle">
         <input type="checkbox" id="hideSandboxBanner">
         <span class="slider"></span>
