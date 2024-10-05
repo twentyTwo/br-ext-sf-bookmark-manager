@@ -131,4 +131,38 @@ document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.sync.get(['hideSandboxBanner'], function(result) {
     document.getElementById('hideSandboxBanner').checked = result.hideSandboxBanner === true;
   });
+
+  // Add this function to get the current tab
+  function getCurrentTab() {
+    return new Promise((resolve) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        resolve(tabs[0]);
+      });
+    });
+  }
+
+  // Add this function to update the org name in the popup
+  function updateOrgName() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      if (tabs[0] && tabs[0].url) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "getOrgName" }, function(response) {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+            document.getElementById('orgName').textContent = "Unable to fetch org name";
+          } else if (response && response.orgName) {
+            document.getElementById('orgName').textContent = response.orgName;
+          } else {
+            document.getElementById('orgName').textContent = "Unknown org";
+          }
+        });
+      } else {
+        document.getElementById('orgName').textContent = "Not a Salesforce org";
+      }
+    });
+  }
+
+  // Call updateOrgName immediately when the popup opens
+  updateOrgName();
+
+  // ... (rest of your existing popup.js code)
 });

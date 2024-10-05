@@ -312,7 +312,7 @@ function setupSandboxBannerObserver() {
   const observer = new MutationObserver((mutations, obs) => {
     if (hideSandboxBanner()) {
       console.log('Sandbox banner hidden after DOM mutation');
-      obs.disconnect();
+      // Don't disconnect the observer, keep watching for future banner appearances
     }
   });
 
@@ -321,16 +321,24 @@ function setupSandboxBannerObserver() {
     subtree: true
   });
 
-  // Set up a timeout as a fallback
-  setTimeout(() => {
+  // Initial attempt to hide the banner
+  hideSandboxBanner();
+
+  // Set up an interval to keep trying to hide the banner
+  const intervalId = setInterval(() => {
     if (hideSandboxBanner()) {
-      console.log('Sandbox banner hidden after timeout');
-      observer.disconnect();
-    } else {
-      console.error('Failed to hide sandbox banner after timeout');
-      observer.disconnect();
+      console.log('Sandbox banner hidden after interval check');
+      clearInterval(intervalId);
     }
-  }, 750); // 
+  }, 500); // Check every 500ms
+
+  // Set a timeout to stop checking after a certain period (e.g., 10 seconds)
+  setTimeout(() => {
+    clearInterval(intervalId);
+    if (!hideSandboxBanner()) {
+      console.error('Failed to hide sandbox banner after multiple attempts');
+    }
+  }, 10000);
 }
 
 function unhideSandboxBanner() {
@@ -344,10 +352,10 @@ function unhideSandboxBanner() {
   }
 }
 
-function saveHideBannerState(orgUrl, hide) {
-  hideBannerState[orgUrl] = hide;
+function saveHideBannerState(orgName, hide) {
+  hideBannerState[orgName] = hide;
   chrome.storage.local.set({ hideBannerState: hideBannerState }, function() {
-    console.log(`Hide banner state saved for ${orgUrl}: ${hide}`);
+    console.log(`Hide banner state saved for ${orgName}: ${hide}`);
   });
 }
 
@@ -381,6 +389,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       unhideSandboxBanner();
     }
     saveHideBannerState(currentOrgUrl, request.hide);
+  } else if (request.action === "getOrgName") {
+    sendResponse({ orgName: getCurrentOrgUrl() });
+    return true; // This line is important for asynchronous response
   }
 });
 
@@ -388,26 +399,28 @@ chrome.storage.sync.get(['showBanner', 'showBookmark'], function(result) {
   showBanner = result.showBanner !== false;
   showBookmark = result.showBookmark !== false;
   
-  chrome.storage.local.get({ hideBannerState: {} }, function(localResult) {
-    hideBannerState = localResult.hideBannerState;
-    const currentOrgUrl = getCurrentOrgUrl();
-    console.log(`Initial hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
-
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    addSalesforceBanner();
+    initializeHideBanner();
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
       addSalesforceBanner();
-      if (hideBannerState[currentOrgUrl]) {
-        setupSandboxBannerObserver();
-      }
-    } else {
-      document.addEventListener('DOMContentLoaded', function() {
-        addSalesforceBanner();
-        if (hideBannerState[currentOrgUrl]) {
-          setupSandboxBannerObserver();
-        }
-      });
+      initializeHideBanner();
+    });
+  }
+});
+
+// Add a new function to handle the initial hide banner check and setup
+function initializeHideBanner() {
+  const currentOrgUrl = getCurrentOrgUrl();
+  chrome.storage.local.get({ hideBannerState: {} }, function(result) {
+    hideBannerState = result.hideBannerState;
+    console.log(`Checking hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
+    if (hideBannerState[currentOrgUrl]) {
+      setupSandboxBannerObserver();
     }
   });
-});
+}
 
 // Update the URL change listener
 let lastUrl = location.href; 
@@ -418,19 +431,22 @@ new MutationObserver(() => {
     console.log('URL changed, re-running addSalesforceBanner');
     addSalesforceBanner();
     addBookmarkItem();
-    const currentOrgUrl = getCurrentOrgUrl();
-    console.log(`Checking hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
-    if (hideBannerState[currentOrgUrl]) {
-      setupSandboxBannerObserver();
-    } else {
-      unhideSandboxBanner();
-    }
+    initializeHideBanner();
   }
 }).observe(document, {subtree: true, childList: true});
 
 function getCurrentOrgUrl() {
   const url = new URL(window.location.href);
-  return url.origin; // This will return the full org URL (e.g., https://myorg.my.salesforce.com)
+  const hostname = url.hostname;
+  
+  // Remove 'www.' if present
+  const domainParts = hostname.replace(/^www\./, '').split('.');
+  
+  // Get the first part (org name)
+  const orgName = domainParts[0];
+  
+  console.log(`Extracted org name: ${orgName}`);
+  return orgName;
 }
 
 function showConfirmationMessage(message) {
