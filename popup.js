@@ -2,13 +2,20 @@ document.addEventListener('DOMContentLoaded', function() {
   const toggleBanner = document.getElementById('toggleBanner');
   const toggleBookmark = document.getElementById('toggleBookmark');
   const hideSandboxBanner = document.getElementById('hideSandboxBanner');
-  const resetBookmarks = document.getElementById('resetBookmarks');
   const setupIcon = document.getElementById('setupIcon');
   const colorPicker = document.getElementById('colorPicker');
   const orgUrlInput = document.getElementById('orgUrl');
   const colorOptions = document.getElementById('colorOptions');
   const saveOrgColorBtn = document.getElementById('saveOrgColor');
   const mainOptions = document.getElementById('mainOptions');
+  const showAllBookmarksBtn = document.getElementById('showAllBookmarks');
+
+  // Check if all elements exist
+  if (!toggleBanner || !toggleBookmark || !hideSandboxBanner || !setupIcon || !colorPicker || 
+      !orgUrlInput || !colorOptions || !saveOrgColorBtn || !mainOptions || !showAllBookmarksBtn) {
+    console.error('One or more elements not found in the DOM');
+    return;
+  }
 
   const colors = [
     '#2C3E50', '#34495E', '#1ABC9C', '#16A085', '#2980B9',
@@ -16,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     '#2ECC71', '#27AE60', '#F39C12', '#E67E22', '#BDC3C7',
     '#7F8C8D', '#ECF0F1', '#95A5A6', '#F1C40F', '#D35400'
   ];
-  
 
   let selectedColor = '';
 
@@ -60,25 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
       chrome.tabs.sendMessage(tabs[0].id, {action: "hideSandboxBanner", hide: hide});
     });
     chrome.storage.sync.set({hideSandboxBanner: hide});
-  });
-
-  resetBookmarks.addEventListener('click', function() {
-    if (confirm('Are you sure you want to reset bookmarks for this org? This action cannot be undone.')) {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if (tabs[0] && tabs[0].url) {
-          const url = new URL(tabs[0].url);
-          const orgUrl = url.origin;
-          chrome.storage.local.get({bookmarks: []}, function(result) {
-            let bookmarks = result.bookmarks;
-            bookmarks = bookmarks.filter(bookmark => bookmark.orgUrl !== orgUrl);
-            chrome.storage.local.set({bookmarks: bookmarks}, function() {
-              console.log('Bookmarks for this org have been reset');
-              chrome.tabs.sendMessage(tabs[0].id, {action: "resetBookmarks", orgUrl: orgUrl});
-            });
-          });
-        }
-      });
-    }
   });
 
   setupIcon.addEventListener('click', function() {
@@ -129,19 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Load saved state
   chrome.storage.sync.get(['hideSandboxBanner'], function(result) {
-    document.getElementById('hideSandboxBanner').checked = result.hideSandboxBanner === true;
+    hideSandboxBanner.checked = result.hideSandboxBanner === true;
   });
 
-  // Add this function to get the current tab
-  function getCurrentTab() {
-    return new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        resolve(tabs[0]);
-      });
-    });
-  }
-
-  // Add this function to update the org name in the popup
   function updateOrgName() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       if (tabs[0] && tabs[0].url) {
@@ -149,37 +126,38 @@ document.addEventListener('DOMContentLoaded', function() {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
             document.getElementById('orgName').textContent = "Unable to fetch org name";
-            updateSandboxOption(false);
           } else if (response && response.orgName) {
             document.getElementById('orgName').textContent = response.orgName;
-            updateSandboxOption(tabs[0].url.toLowerCase().includes('sandbox'));
           } else {
             document.getElementById('orgName').textContent = "Unknown org";
-            updateSandboxOption(false);
           }
         });
       } else {
         document.getElementById('orgName').textContent = "Not a Salesforce org";
-        updateSandboxOption(false);
       }
     });
   }
 
   function updateSandboxOption(isSandbox) {
     const sandboxOption = document.querySelector('.sandbox-option');
-    if (isSandbox) {
-      sandboxOption.classList.remove('fade-out');
-      hideSandboxBanner.disabled = false;
-    } else {
-      sandboxOption.classList.add('fade-out');
-      hideSandboxBanner.checked = false;
-      hideSandboxBanner.disabled = true;
-      chrome.storage.sync.set({hideSandboxBanner: false});
+    if (sandboxOption) {
+      if (isSandbox) {
+        sandboxOption.classList.remove('fade-out');
+        hideSandboxBanner.disabled = false;
+      } else {
+        sandboxOption.classList.add('fade-out');
+        hideSandboxBanner.checked = false;
+        hideSandboxBanner.disabled = true;
+        chrome.storage.sync.set({hideSandboxBanner: false});
+      }
     }
   }
 
   // Call updateOrgName immediately when the popup opens
   updateOrgName();
 
-  // ... (rest of your existing popup.js code)
+  showAllBookmarksBtn.addEventListener('click', function() {
+    const allBookmarksUrl = chrome.runtime.getURL('allBookmarks.html');
+    chrome.tabs.create({ url: allBookmarksUrl });
+  });
 });

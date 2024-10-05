@@ -1,0 +1,120 @@
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f6f9;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #0070d2;
+  margin: 0;
+}
+
+.reset-all-button {
+  background-color: #c23934;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.reset-all-button:hover {
+  background-color: #a61a14;
+}
+
+.reset-all-button i {
+  margin-right: 8px;
+}
+
+.bookmarks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.org-section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+}
+
+.org-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.org-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #16325c;
+  margin: 0;
+}
+
+.reset-org-button {
+  background-color: #f8f9fa;
+  color: #c23934;
+  border: 1px solid #c23934;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s;
+}
+
+.reset-org-button:hover {
+  background-color: #c23934;
+  color: #ffffff;
+}
+
+.bookmark-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bookmark-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.bookmark-item:last-child {
+  border-bottom: none;
+}
+
+.bookmark-link {
+  color: #0070d2;
+  text-decoration: none;
+}
+
+.bookmark-link:hover {
+  text-decoration: underline;
+}
+
+.no-bookmarks {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
