@@ -125,6 +125,29 @@ function createBookmarkPanel() {
       <div class="panel-content scrollable" style="max-height: 300px; overflow-y: auto; padding: 0.75rem;">
         <ul id="bookmarkList" style="list-style-type: none; padding: 0; margin: 0;"></ul>
       </div>
+      <style>
+        .bookmark-item {
+          display: flex;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid #e0e0e0;
+          cursor: default;
+        }
+        .drag-handle {
+          cursor: move;
+          cursor: grab;
+          padding: 0 8px;
+          color: #999;
+        }
+        .bookmark-item.dragging {
+          opacity: 0.5;
+          cursor: grabbing;
+        }
+        .bookmark-item.dragging .drag-handle {
+          cursor: grabbing;
+        }
+        /* ... (other existing styles) */
+      </style>
     </div>
   `;
 
@@ -187,13 +210,14 @@ function displayBookmarks() {
   const currentOrgUrl = getCurrentOrgUrl();
   
   chrome.storage.local.get({bookmarks: []}, function(result) {
-    const bookmarks = result.bookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
+    let bookmarks = result.bookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
     
     if (bookmarks.length === 0) {
       bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
     } else {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
-        <li class="bookmark-item">
+        <li class="bookmark-item" draggable="true" data-index="${index}">
+          <div class="drag-handle">☰</div>
           <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.url}" target="_blank">
             <span class="bookmark-title">${bookmark.title}</span>
           </a>
@@ -220,8 +244,8 @@ function displayBookmarks() {
         });
       });
 
-       // Add event listeners for edit buttons
-       document.querySelectorAll('.edit-bookmark').forEach(button => {
+      // Add event listeners for edit buttons
+      document.querySelectorAll('.edit-bookmark').forEach(button => {
         button.addEventListener('click', function(e) {
           e.stopPropagation();
           e.preventDefault();
@@ -245,7 +269,101 @@ function displayBookmarks() {
           }
         });
       });
+
+      // Add drag and drop functionality
+      addDragAndDropListeners();
     }
+  });
+}
+
+function addDragAndDropListeners() {
+  const bookmarkList = document.getElementById('bookmarkList');
+  let draggedItem = null;
+
+  bookmarkList.addEventListener('dragstart', function(e) {
+    draggedItem = e.target.closest('.bookmark-item');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', draggedItem.innerHTML);
+    draggedItem.classList.add('dragging');
+    
+    // Set the drag image to the entire bookmark item
+    e.dataTransfer.setDragImage(draggedItem, 0, 0);
+    
+    // Change cursor to grabbing for the entire document during drag
+    document.body.style.cursor = 'grabbing';
+  });
+
+  bookmarkList.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const targetItem = e.target.closest('.bookmark-item');
+    if (targetItem && targetItem !== draggedItem) {
+      const boundingRect = targetItem.getBoundingClientRect();
+      const offset = boundingRect.y + (boundingRect.height / 2);
+      if (e.clientY - offset > 0) {
+        targetItem.style.borderBottom = 'solid 2px #0070d2';
+        targetItem.style.borderTop = '';
+      } else {
+        targetItem.style.borderTop = 'solid 2px #0070d2';
+        targetItem.style.borderBottom = '';
+      }
+    }
+  });
+
+  bookmarkList.addEventListener('dragleave', function(e) {
+    e.target.closest('.bookmark-item').style.borderTop = '';
+    e.target.closest('.bookmark-item').style.borderBottom = '';
+  });
+
+  bookmarkList.addEventListener('drop', function(e) {
+    e.preventDefault();
+    const targetItem = e.target.closest('.bookmark-item');
+    if (targetItem && targetItem !== draggedItem) {
+      const items = Array.from(bookmarkList.querySelectorAll('.bookmark-item'));
+      const fromIndex = items.indexOf(draggedItem);
+      const toIndex = items.indexOf(targetItem);
+      
+      if (fromIndex < toIndex) {
+        bookmarkList.insertBefore(draggedItem, targetItem.nextSibling);
+      } else {
+        bookmarkList.insertBefore(draggedItem, targetItem);
+      }
+      
+      updateBookmarkOrder();
+    }
+    targetItem.style.borderTop = '';
+    targetItem.style.borderBottom = '';
+    
+    // Reset cursor
+    document.body.style.cursor = '';
+  });
+
+  bookmarkList.addEventListener('dragend', function(e) {
+    draggedItem.classList.remove('dragging');
+    draggedItem = null;
+    
+    // Reset cursor
+    document.body.style.cursor = '';
+  });
+}
+
+function updateBookmarkOrder() {
+  const currentOrgUrl = getCurrentOrgUrl();
+  const bookmarkItems = Array.from(document.querySelectorAll('.bookmark-item'));
+  
+  chrome.storage.local.get({bookmarks: []}, function(result) {
+    let allBookmarks = result.bookmarks;
+    let orgBookmarks = allBookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
+    
+    const newOrder = bookmarkItems.map(item => item.querySelector('.bookmark-link').href);
+    orgBookmarks.sort((a, b) => newOrder.indexOf(a.url) - newOrder.indexOf(b.url));
+    
+    allBookmarks = allBookmarks.filter(bookmark => bookmark.orgUrl !== currentOrgUrl).concat(orgBookmarks);
+    
+    chrome.storage.local.set({bookmarks: allBookmarks}, function() {
+      console.log('Bookmark order updated');
+      showNotification('Bookmark order updated');
+    });
   });
 }
 
