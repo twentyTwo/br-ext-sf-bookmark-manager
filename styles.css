@@ -169,3 +169,12 @@
   background-color: #f3f3f3;
 }
 
+.custom-bookmark-item .slds-button__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.custom-bookmark-item .slds-button__icon:hover {
+  stroke: #0070d2;
+}
+

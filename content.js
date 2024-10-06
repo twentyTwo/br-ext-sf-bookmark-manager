@@ -79,15 +79,13 @@ function addBookmarkItem() {
   if (notificationIcon && !document.querySelector('.custom-bookmark-item')) {
     
     const bookmarkItemHtml = `
-      <li class="slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click custom-bookmark-item" style="position: relative; top: -2px;">
+      <li class="slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click custom-bookmark-item">
         <div class="forceHeaderButton">
           <button aria-expanded="false" aria-haspopup="true" type="button" class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__item-action">
             <div class="tooltipTrigger tooltip-trigger uiTooltip">
-              <lightning-icon class="slds-button__icon slds-global-header__icon">
-                <svg focusable="false" data-key="bookmark" aria-hidden="true" viewBox="0 0 18.46 18.46" class="slds-icon slds-icon_x-small" style="fill: #919191; height: 17px;">
-                  <path d="M13.845 18.46l-4.615-4.615c-.215-.215-.565-.215-.78 0L3.845 18.46c-.43.43-1.165.125-1.165-.48V1.845C2.68 1.125 3.265.54 3.985.54h10.49c.72 0 1.305.585 1.305 1.305v16.135c0 .605-.735.91-1.165.48z"></path>
-                </svg>
-              </lightning-icon>
+              <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="slds-icon slds-icon_x-small">
+                <path d="M130 0h260c17 0 30 13 30 30v460c0 6-7 10-13 7l-147-86-147 86c-6 3-13-1-13-7V30c0-17 13-30 30-30z" fill="#919191"></path>
+              </svg>
               <span role="tooltip" class="tooltip-invisible">Bookmarks</span>
             </div>
           </button>
@@ -105,7 +103,8 @@ function addBookmarkItem() {
 function handleBookmarkItemClick(event) {
   event.preventDefault();
   console.log('Custom bookmark item clicked');
-  toggleBookmarkPanel();
+  addCurrentPageBookmark();
+  createBookmarkPanel(); // This will create and show the bookmark panel immediately
 }
 
 function toggleBookmarkPanel() {
@@ -118,12 +117,15 @@ function toggleBookmarkPanel() {
 }
 
 function createBookmarkPanel() {
+  let panel = document.querySelector('.bookmark-panel');
+  if (panel) {
+    panel.remove();
+  }
+
   const panelHtml = `
     <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999;">
       <div class="panel-header" style="padding: 0.5rem; border-bottom: 1px solid #d8dde6; display: flex; justify-content: space-between; align-items: center;">
-        <button type="button" class="add-bookmark-btn slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0 0.5rem;">
-          Bookmark this page
-        </button>
+        <h3 style="margin: 0;">Bookmarks</h3>
         <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="margin-left: 0.5rem;">
           <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52" width="14" height="14">
             <path fill="#706e6b" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
@@ -145,9 +147,6 @@ function createBookmarkPanel() {
     document.querySelector('.bookmark-panel').remove();
   });
 
-  const addBookmarkBtn = document.querySelector('.bookmark-panel .add-bookmark-btn');
-  addBookmarkBtn.addEventListener('click', addCurrentPageBookmark);
-
   // Load and display existing bookmarks
   displayBookmarks();
 }
@@ -163,12 +162,12 @@ function addCurrentPageBookmark() {
       bookmarks.push({url, title, orgUrl});
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark added');
+        flashBookmarkIcon('#4CAF50'); // Green flash for successful add
         displayBookmarks();
-        showConfirmationMessage('Bookmark added successfully');
       });
     } else {
       console.log('Bookmark already exists');
-      showConfirmationMessage('Bookmark already exists');
+      flashBookmarkIcon('#FFA500'); // Orange flash for already existing
     }
   });
 }
@@ -211,8 +210,8 @@ function displayBookmarks() {
         });
       });
 
-      // Add event listeners for edit buttons
-      document.querySelectorAll('.edit-bookmark').forEach(button => {
+       // Add event listeners for edit buttons
+       document.querySelectorAll('.edit-bookmark').forEach(button => {
         button.addEventListener('click', function(e) {
           e.stopPropagation();
           e.preventDefault();
@@ -256,11 +255,15 @@ function updateBookmarkTitle(newTitle, url) {
 function removeBookmark(url) {
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let bookmarks = result.bookmarks;
+    const initialLength = bookmarks.length;
     bookmarks = bookmarks.filter(bookmark => bookmark.url !== url);
-    chrome.storage.local.set({bookmarks: bookmarks}, function() {
-      console.log('Bookmark removed');
-      displayBookmarks();
-    });
+    if (bookmarks.length < initialLength) {
+      chrome.storage.local.set({bookmarks: bookmarks}, function() {
+        console.log('Bookmark removed');
+        flashBookmarkIcon('#FF0000'); // Red flash for removal
+        displayBookmarks();
+      });
+    }
   });
 }
 
@@ -449,22 +452,13 @@ function getCurrentOrgUrl() {
   return orgName;
 }
 
-function showConfirmationMessage(message) {
-  const confirmationMessage = document.createElement('div');
-  confirmationMessage.className = 'sf-extension-confirmation-message';
-  confirmationMessage.textContent = message;
-  document.body.appendChild(confirmationMessage);
-
-  // Force a reflow to trigger the transition
-  confirmationMessage.offsetHeight;
-
-  // Add the 'show' class to trigger the fade-in
-  confirmationMessage.classList.add('show');
-
-  setTimeout(() => {
-    confirmationMessage.classList.remove('show');
+function flashBookmarkIcon(color, duration = 2000) {
+  const bookmarkIcon = document.querySelector('.custom-bookmark-item svg path');
+  if (bookmarkIcon) {
+    const originalFill = bookmarkIcon.getAttribute('fill');
+    bookmarkIcon.setAttribute('fill', color);
     setTimeout(() => {
-      confirmationMessage.remove();
-    }, 300); // Wait for the fade-out transition to complete before removing
-  }, 1500);
+      bookmarkIcon.setAttribute('fill', originalFill);
+    }, duration);
+  }
 }

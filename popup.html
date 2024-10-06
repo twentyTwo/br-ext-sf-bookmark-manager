@@ -163,6 +163,38 @@
       opacity: 0.5;
       pointer-events: none;
     }
+    .bookmark-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+    .bookmark-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .bookmark-link {
+      color: #0070d2;
+      text-decoration: none;
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .remove-bookmark {
+      background: none;
+      border: none;
+      color: #c23934;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0 5px;
+    }
+    .no-bookmarks {
+      font-style: italic;
+      color: #666;
+    }
   </style>
 </head>
 <body>
