@@ -76,52 +76,6 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
-    .setup-icon {
-      cursor: pointer;
-      margin-left: 5px;
-      font-size: 14px;
-    }
-    .color-picker {
-      display: none;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #e0e0e0;
-    }
-    .color-picker.show {
-      display: block;
-    }
-    .color-options {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 3px;
-      margin-bottom: 10px;
-    }
-    .color-option {
-      width: 100%;
-      padding-bottom: 100%;
-      cursor: pointer;
-      border: 1px solid #ccc;
-    }
-    #saveOrgColor, .reset-button {
-      background-color: #0070d2;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      border-radius: 4px;
-      width: 100%;
-      font-size: 14px;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-    #saveOrgColor:hover, .reset-button:hover {
-      background-color: #005fb2;
-    }
-    .reset-button {
-      background-color: #f8f9fa;
-      color: #dc3545;
-      border: 1px solid #dc3545;
-    }
     .action-button {
       background-color: #0070d2;
       color: white;
@@ -132,10 +86,6 @@
       width: 100%;
       font-size: 14px;
       font-weight: bold;
-    }
-    .reset-button:hover {
-      background-color: #dc3545;
-      color: #ffffff;
     }
     .footer {
       margin-top: 20px;
@@ -155,9 +105,6 @@
       font-size: 11px;
       color: #666;
       margin-top: 10px;
-    }
-    .hidden {
-      display: none;
     }
     .sandbox-option.fade-out {
       opacity: 0.5;
@@ -201,34 +148,7 @@
   <div class="header">Salesforce Bookmark Manager</div>
   <div id="orgName" class="org-name"></div>
   <div id="mainOptions">
-    <div class="option">
-      <label class="toggle">
-        <input type="checkbox" id="toggleBanner">
-        <span class="slider"></span>
-      </label>
-      <label for="toggleBanner">Color the Menu Bar</label>
-      <span class="setup-icon" id="setupIcon">⚙️</span>
-    </div>
-    <div class="option">
-      <label class="toggle">
-        <input type="checkbox" id="toggleBookmark">
-        <span class="slider"></span>
-      </label>
-      <label for="toggleBookmark">Show Bookmark Icon</label>
-    </div>
-    <div class="option sandbox-option">
-      <label class="toggle">
-        <input type="checkbox" id="hideSandboxBanner">
-        <span class="slider"></span>
-      </label>
-      <label for="hideSandboxBanner">Hide Sandbox Banner</label>
-    </div>
     <button id="showAllBookmarks" class="action-button">Show All Bookmarks</button>
-  </div>
-  <div class="color-picker" id="colorPicker">
-    <input type="text" id="orgUrl" placeholder="Enter Salesforce Org URL" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
-    <div class="color-options" id="colorOptions"></div>
-    <button id="saveOrgColor">Save Org Color</button>
   </div>
   <div class="footer">
     <a href="https://docs.google.com/document/d/1eqiYi7NaOk_cru7gk9Q3eE9xrMISla8awEfME9UTJDg/pub" target="_blank" title="User Guide">

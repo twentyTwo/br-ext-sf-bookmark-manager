@@ -1,6 +1,4 @@
-let showBanner = true;
 let showBookmark = true;
-let hideBannerState = {};
 
 function addSalesforceBanner() {
   console.log('addSalesforceBanner called');
@@ -13,42 +11,21 @@ function addSalesforceBanner() {
       return false;
     }
 
-    console.log('Header element found, setting background color');
-    const url = window.location.href.toLowerCase();
-    const orgUrl = new URL(url).origin;
-
-    chrome.storage.local.get({orgColors: {}}, function(result) {
-      const orgColors = result.orgColors;
-      if (orgColors[orgUrl]) {
-        headerElement.style.backgroundColor = orgColors[orgUrl];
-      } else {
-        // Fallback to default colors if no custom color is set
-        if (url.includes('sandbox') && url.includes('full')) {
-          headerElement.style.backgroundColor = 'orange';
-        } else if (url.includes('sandbox')) {
-          headerElement.style.backgroundColor = 'green';
-        } else if (url.includes('dev-ed')) {
-          headerElement.style.backgroundColor = 'blue';
-        } else {
-          headerElement.style.backgroundColor = 'darkred';
-        }
-      }
-    });
-
+    console.log('Header element found');
     addBookmarkItem();
     return true;
   }
 
   // Try to set the background immediately
   if (setHeaderBackground()) {
-    console.log('Background set successfully');
+    console.log('Header setup completed successfully');
     return;
   }
 
   // If immediate attempt fails, set up a MutationObserver
   const observer = new MutationObserver((mutations, obs) => {
     if (setHeaderBackground()) {
-      console.log('Background set successfully after DOM mutation');
+      console.log('Header setup completed successfully after DOM mutation');
       obs.disconnect();
     }
   });
@@ -63,10 +40,10 @@ function addSalesforceBanner() {
   // Set up a timeout as a fallback
   setTimeout(() => {
     if (setHeaderBackground()) {
-      console.log('Background set successfully after timeout');
+      console.log('Header setup completed successfully after timeout');
       observer.disconnect();
     } else {
-      console.error('Failed to set background color after timeout');
+      console.error('Failed to set up header after timeout');
       observer.disconnect();
     }
   }, 5000); // 5 second timeout
@@ -103,7 +80,6 @@ function addBookmarkItem() {
 function handleBookmarkItemClick(event) {
   event.preventDefault();
   console.log('Custom bookmark item clicked');
-  addCurrentPageBookmark();
   createBookmarkPanel(); // This will create and show the bookmark panel immediately
 }
 
@@ -123,17 +99,30 @@ function createBookmarkPanel() {
   }
 
   const panelHtml = `
-    <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999;">
-      <div class="panel-header" style="padding: 0.5rem; border-bottom: 1px solid #d8dde6; display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0;">Bookmarks</h3>
-        <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="margin-left: 0.5rem;">
-          <svg class="slds-button__icon" aria-hidden="true" viewBox="0 0 52 52" width="14" height="14">
+    <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
+      <div id="bookmarkNotification" style="padding: 0.5rem; font-size: 0.8rem; color: #006400; text-align: center; display: none;"></div>
+      <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6; display: flex; justify-content: space-between; align-items: center;">
+        <div class="button-group" style="display: flex; gap: 0.5rem;">
+          <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #0070d2; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+            </svg>
+            Add Bookmark
+          </button>
+          <button id="showAllBookmarksBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #f4f6f9; color: #16325c; border: 1px solid #d8dde6; border-radius: 0.25rem; cursor: pointer;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8zm0 3h4v2h-4zm0-6h8v2h-8z" fill="currentColor"/>
+            </svg>
+            Show All
+          </button>
+        </div>
+        <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="background: none; border: none; cursor: pointer;">
+          <svg width="14" height="14" viewBox="0 0 52 52">
             <path fill="#706e6b" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
           </svg>
-          <span class="slds-assistive-text">Close</span>
         </button>
       </div>
-      <div class="panel-content scrollable" style="max-height: 300px; overflow-y: auto; padding: 0.5rem;">
+      <div class="panel-content scrollable" style="max-height: 300px; overflow-y: auto; padding: 0.75rem;">
         <ul id="bookmarkList" style="list-style-type: none; padding: 0; margin: 0;"></ul>
       </div>
     </div>
@@ -147,8 +136,27 @@ function createBookmarkPanel() {
     document.querySelector('.bookmark-panel').remove();
   });
 
+  const addBookmarkBtn = document.getElementById('addBookmarkBtn');
+  addBookmarkBtn.addEventListener('click', addCurrentPageBookmark);
+
+  const showAllBookmarksBtn = document.getElementById('showAllBookmarksBtn');
+  showAllBookmarksBtn.addEventListener('click', () => {
+    chrome.runtime.sendMessage({action: "openAllBookmarks"});
+  });
+
   // Load and display existing bookmarks
   displayBookmarks();
+}
+
+function showNotification(message, duration = 3000) {
+  const notificationElement = document.getElementById('bookmarkNotification');
+  if (notificationElement) {
+    notificationElement.textContent = message;
+    notificationElement.style.display = 'block';
+    setTimeout(() => {
+      notificationElement.style.display = 'none';
+    }, duration);
+  }
 }
 
 function addCurrentPageBookmark() {
@@ -164,10 +172,12 @@ function addCurrentPageBookmark() {
         console.log('Bookmark added');
         flashBookmarkIcon('#4CAF50'); // Green flash for successful add
         displayBookmarks();
+        showNotification('Bookmark added successfully');
       });
     } else {
       console.log('Bookmark already exists');
       flashBookmarkIcon('#FFA500'); // Orange flash for already existing
+      showNotification('Bookmark already exists');
     }
   });
 }
@@ -247,6 +257,7 @@ function updateBookmarkTitle(newTitle, url) {
       bookmarks[bookmarkIndex].title = newTitle;
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark title updated');
+        showNotification('Bookmark title updated successfully');
       });
     }
   });
@@ -262,111 +273,14 @@ function removeBookmark(url) {
         console.log('Bookmark removed');
         flashBookmarkIcon('#FF0000'); // Red flash for removal
         displayBookmarks();
+        showNotification('Bookmark removed successfully');
       });
     }
-  });
-}
-
-function updateBannerVisibility() {
-  const headerElement = document.querySelector('span[role="navigation"].button-container-a11y[aria-label="Global Header"]');
-  if (headerElement) {
-    if (showBanner) {
-      const url = window.location.href.toLowerCase();
-      const orgUrl = new URL(url).origin;
-
-      chrome.storage.local.get({orgColors: {}}, function(result) {
-        const orgColors = result.orgColors;
-        if (orgColors[orgUrl]) {
-          headerElement.style.backgroundColor = orgColors[orgUrl];
-        } else {
-          // Fallback to default colors if no custom color is set
-          if (url.includes('sandbox') && url.includes('full')) {
-            headerElement.style.backgroundColor = 'orange';
-          } else if (url.includes('sandbox')) {
-            headerElement.style.backgroundColor = 'green';
-          } else if (url.includes('dev-ed')) {
-            headerElement.style.backgroundColor = 'blue';
-          } else {
-            headerElement.style.backgroundColor = 'darkred';
-          }
-        }
-      });
-    } else {
-      headerElement.style.backgroundColor = ''; // This will reset to the original color
-    }
-  }
-}
-
-function hideSandboxBanner() {
-  console.log('Attempting to hide sandbox banner');
-  const sandboxBanner = document.querySelector('.slds-color__background_gray-1.slds-text-align_center.slds-size_full.slds-text-body_regular.oneSystemMessage');
-  if (sandboxBanner) {
-    sandboxBanner.style.display = 'none';
-    console.log('Sandbox banner hidden');
-    return true;
-  } else {
-    console.log('Sandbox banner not found, will retry');
-    return false;
-  }
-}
-
-function setupSandboxBannerObserver() {
-  console.log('Setting up sandbox banner observer');
-  const observer = new MutationObserver((mutations, obs) => {
-    if (hideSandboxBanner()) {
-      console.log('Sandbox banner hidden after DOM mutation');
-      // Don't disconnect the observer, keep watching for future banner appearances
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
-  // Initial attempt to hide the banner
-  hideSandboxBanner();
-
-  // Set up an interval to keep trying to hide the banner
-  const intervalId = setInterval(() => {
-    if (hideSandboxBanner()) {
-      console.log('Sandbox banner hidden after interval check');
-      clearInterval(intervalId);
-    }
-  }, 500); // Check every 500ms
-
-  // Set a timeout to stop checking after a certain period (e.g., 10 seconds)
-  setTimeout(() => {
-    clearInterval(intervalId);
-    if (!hideSandboxBanner()) {
-      console.error('Failed to hide sandbox banner after multiple attempts');
-    }
-  }, 10000);
-}
-
-function unhideSandboxBanner() {
-  console.log('Attempting to unhide sandbox banner');
-  const sandboxBanner = document.querySelector('.slds-color__background_gray-1.slds-text-align_center.slds-size_full.slds-text-body_regular.oneSystemMessage');
-  if (sandboxBanner) {
-    sandboxBanner.style.display = '';
-    console.log('Sandbox banner unhidden');
-  } else {
-    console.log('Sandbox banner not found for unhiding');
-  }
-}
-
-function saveHideBannerState(orgName, hide) {
-  hideBannerState[orgName] = hide;
-  chrome.storage.local.set({ hideBannerState: hideBannerState }, function() {
-    console.log(`Hide banner state saved for ${orgName}: ${hide}`);
   });
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === "toggleBanner") {
-    showBanner = request.show;
-    updateBannerVisibility();
-  } else if (request.action === "toggleBookmark") {
+  if (request.action === "toggleBookmark") {
     showBookmark = request.show;
     if (showBookmark) {
       addBookmarkItem();
@@ -383,47 +297,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
       bookmarkList.innerHTML = '<li class="no-bookmarks">No bookmarks for this org yet.</li>';
     }
     console.log('Bookmarks for this org have been reset');
-  } else if (request.action === "hideSandboxBanner") {
-    const currentOrgUrl = getCurrentOrgUrl();
-    console.log(`Received hideSandboxBanner request for ${currentOrgUrl}: ${request.hide}`);
-    if (request.hide) {
-      setupSandboxBannerObserver();
-    } else {
-      unhideSandboxBanner();
-    }
-    saveHideBannerState(currentOrgUrl, request.hide);
   } else if (request.action === "getOrgName") {
     sendResponse({ orgName: getCurrentOrgUrl() });
     return true; // This line is important for asynchronous response
   }
 });
 
-chrome.storage.sync.get(['showBanner', 'showBookmark'], function(result) {
-  showBanner = result.showBanner !== false;
+chrome.storage.sync.get(['showBookmark'], function(result) {
   showBookmark = result.showBookmark !== false;
   
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     addSalesforceBanner();
-    initializeHideBanner();
   } else {
     document.addEventListener('DOMContentLoaded', function() {
       addSalesforceBanner();
-      initializeHideBanner();
     });
   }
 });
-
-// Add a new function to handle the initial hide banner check and setup
-function initializeHideBanner() {
-  const currentOrgUrl = getCurrentOrgUrl();
-  chrome.storage.local.get({ hideBannerState: {} }, function(result) {
-    hideBannerState = result.hideBannerState;
-    console.log(`Checking hide banner state for ${currentOrgUrl}: ${hideBannerState[currentOrgUrl]}`);
-    if (hideBannerState[currentOrgUrl]) {
-      setupSandboxBannerObserver();
-    }
-  });
-}
 
 // Update the URL change listener
 let lastUrl = location.href; 
@@ -433,8 +323,6 @@ new MutationObserver(() => {
     lastUrl = url;
     console.log('URL changed, re-running addSalesforceBanner');
     addSalesforceBanner();
-    addBookmarkItem();
-    initializeHideBanner();
   }
 }).observe(document, {subtree: true, childList: true});
 
@@ -453,12 +341,12 @@ function getCurrentOrgUrl() {
 }
 
 function flashBookmarkIcon(color, duration = 2000) {
-  const bookmarkIcon = document.querySelector('.custom-bookmark-item svg path');
-  if (bookmarkIcon) {
-    const originalFill = bookmarkIcon.getAttribute('fill');
-    bookmarkIcon.setAttribute('fill', color);
-    setTimeout(() => {
-      bookmarkIcon.setAttribute('fill', originalFill);
-    }, duration);
-  }
+  // const bookmarkIcon = document.querySelector('.custom-bookmark-item svg path');
+  // if (bookmarkIcon) {
+  //   const originalFill = bookmarkIcon.getAttribute('fill');
+  //   bookmarkIcon.setAttribute('fill', color);
+  //   setTimeout(() => {
+  //     bookmarkIcon.setAttribute('fill', originalFill);
+  //   }, duration);
+  // }
 }
