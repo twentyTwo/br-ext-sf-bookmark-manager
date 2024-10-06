@@ -100,8 +100,10 @@ function createBookmarkPanel() {
 
   const panelHtml = `
     <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
-      <div id="bookmarkNotification" style="padding: 0.5rem; font-size: 0.8rem; color: #006400; text-align: center; display: none;"></div>
-      <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6; display: flex; justify-content: space-between; align-items: center;">
+      <div id="bookmarkNotification" style="padding: 0.5rem; font-size: 0.8rem; color: #16325c; text-align: center; background-color: #f4f6f9; border-bottom: 1px solid #d8dde6;">
+        Your bookmarks for the Org
+      </div>
+      <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6;">
         <div class="button-group" style="display: flex; gap: 0.5rem;">
           <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #0070d2; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
@@ -116,7 +118,7 @@ function createBookmarkPanel() {
             Show All
           </button>
         </div>
-        <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="background: none; border: none; cursor: pointer;">
+        <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; cursor: pointer;">
           <svg width="14" height="14" viewBox="0 0 52 52">
             <path fill="#706e6b" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
           </svg>
@@ -125,30 +127,39 @@ function createBookmarkPanel() {
       <div class="panel-content scrollable" style="max-height: 300px; overflow-y: auto; padding: 0.75rem;">
         <ul id="bookmarkList" style="list-style-type: none; padding: 0; margin: 0;"></ul>
       </div>
-      <style>
-        .bookmark-item {
-          display: flex;
-          align-items: center;
-          padding: 8px 0;
-          border-bottom: 1px solid #e0e0e0;
-          cursor: default;
-        }
-        .drag-handle {
-          cursor: move;
-          cursor: grab;
-          padding: 0 8px;
-          color: #999;
-        }
-        .bookmark-item.dragging {
-          opacity: 0.5;
-          cursor: grabbing;
-        }
-        .bookmark-item.dragging .drag-handle {
-          cursor: grabbing;
-        }
-        /* ... (other existing styles) */
-      </style>
     </div>
+    <style>
+      .bookmark-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+        cursor: default;
+      }
+      .drag-handle {
+        cursor: move;
+        cursor: grab;
+        padding: 0 8px;
+        color: #999;
+      }
+      .bookmark-item.dragging {
+        opacity: 0.5;
+        cursor: grabbing !important;
+      }
+      .bookmark-item.dragging * {
+        cursor: grabbing !important;
+      }
+      .bookmark-link {
+        flex-grow: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .bookmark-actions {
+        display: flex;
+        gap: 5px;
+      }
+    </style>
   `;
 
   document.body.insertAdjacentHTML('beforeend', panelHtml);
@@ -175,10 +186,16 @@ function showNotification(message, duration = 3000) {
   const notificationElement = document.getElementById('bookmarkNotification');
   if (notificationElement) {
     notificationElement.textContent = message;
-    notificationElement.style.display = 'block';
-    setTimeout(() => {
-      notificationElement.style.display = 'none';
-    }, duration);
+    // Highlight the notification
+    notificationElement.style.backgroundColor = '#fff7de';
+    notificationElement.style.color = '#6b3c00';
+    
+    // // Reset the notification after the duration
+    // setTimeout(() => {
+    //   notificationElement.textContent = 'Your bookmarks for the OrgYour bookmarks for the Org';
+    //   notificationElement.style.backgroundColor = '#f4f6f9';
+    //   notificationElement.style.color = '#16325c';
+    // }, duration);
   }
 }
 
@@ -289,8 +306,8 @@ function addDragAndDropListeners() {
     // Set the drag image to the entire bookmark item
     e.dataTransfer.setDragImage(draggedItem, 0, 0);
     
-    // Change cursor to grabbing for the entire document during drag
-    document.body.style.cursor = 'grabbing';
+    // Change cursor to grabbing for the dragged item
+    draggedItem.style.cursor = 'grabbing';
   });
 
   bookmarkList.addEventListener('dragover', function(e) {
@@ -311,8 +328,11 @@ function addDragAndDropListeners() {
   });
 
   bookmarkList.addEventListener('dragleave', function(e) {
-    e.target.closest('.bookmark-item').style.borderTop = '';
-    e.target.closest('.bookmark-item').style.borderBottom = '';
+    const item = e.target.closest('.bookmark-item');
+    if (item) {
+      item.style.borderTop = '';
+      item.style.borderBottom = '';
+    }
   });
 
   bookmarkList.addEventListener('drop', function(e) {
@@ -331,19 +351,28 @@ function addDragAndDropListeners() {
       
       updateBookmarkOrder();
     }
-    targetItem.style.borderTop = '';
-    targetItem.style.borderBottom = '';
+    if (targetItem) {
+      targetItem.style.borderTop = '';
+      targetItem.style.borderBottom = '';
+    }
     
-    // Reset cursor
-    document.body.style.cursor = '';
+    // Reset cursor for all items
+    bookmarkList.querySelectorAll('.bookmark-item').forEach(item => {
+      item.style.cursor = '';
+    });
   });
 
   bookmarkList.addEventListener('dragend', function(e) {
-    draggedItem.classList.remove('dragging');
+    if (draggedItem) {
+      draggedItem.classList.remove('dragging');
+      draggedItem.style.cursor = '';
+    }
     draggedItem = null;
     
-    // Reset cursor
-    document.body.style.cursor = '';
+    // Reset cursor for all items
+    bookmarkList.querySelectorAll('.bookmark-item').forEach(item => {
+      item.style.cursor = '';
+    });
   });
 }
 
