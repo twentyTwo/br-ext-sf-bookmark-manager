@@ -100,9 +100,6 @@ function createBookmarkPanel() {
 
   const panelHtml = `
     <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
-      <div id="bookmarkNotification" style="padding: 0.5rem; font-size: 0.8rem; color: #16325c; text-align: center; background-color: #f4f6f9; border-bottom: 1px solid #d8dde6;">
-        Your bookmarks for the Org
-      </div>
       <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6;">
         <div class="button-group" style="display: flex; gap: 0.5rem;">
           <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #0070d2; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
@@ -183,20 +180,31 @@ function createBookmarkPanel() {
 }
 
 function showNotification(message, duration = 3000) {
-  const notificationElement = document.getElementById('bookmarkNotification');
-  if (notificationElement) {
-    notificationElement.textContent = message;
-    // Highlight the notification
-    notificationElement.style.backgroundColor = '#fff7de';
-    notificationElement.style.color = '#6b3c00';
-    
-    // // Reset the notification after the duration
-    // setTimeout(() => {
-    //   notificationElement.textContent = 'Your bookmarks for the OrgYour bookmarks for the Org';
-    //   notificationElement.style.backgroundColor = '#f4f6f9';
-    //   notificationElement.style.color = '#16325c';
-    // }, duration);
-  }
+  const notificationElement = document.createElement('div');
+  notificationElement.textContent = message;
+  notificationElement.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #fff7de;
+    color: #6b3c00;
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+  `;
+  
+  document.body.appendChild(notificationElement);
+  
+  setTimeout(() => {
+    notificationElement.style.opacity = '0';
+    notificationElement.style.transition = 'opacity 0.5s ease-out';
+    setTimeout(() => {
+      document.body.removeChild(notificationElement);
+    }, 500);
+  }, duration);
 }
 
 function addCurrentPageBookmark() {
@@ -212,7 +220,7 @@ function addCurrentPageBookmark() {
         console.log('Bookmark added');
         flashBookmarkIcon('#4CAF50'); // Green flash for successful add
         displayBookmarks();
-        showNotification('Bookmark added successfully');
+        showNotification('Bookmark added');
       });
     } else {
       console.log('Bookmark already exists');
@@ -404,7 +412,7 @@ function updateBookmarkTitle(newTitle, url) {
       bookmarks[bookmarkIndex].title = newTitle;
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark title updated');
-        showNotification('Bookmark title updated successfully');
+        showNotification('Bookmark title updated');
       });
     }
   });
@@ -420,7 +428,7 @@ function removeBookmark(url) {
         console.log('Bookmark removed');
         flashBookmarkIcon('#FF0000'); // Red flash for removal
         displayBookmarks();
-        showNotification('Bookmark removed successfully');
+        showNotification('Bookmark removed');
       });
     }
   });
