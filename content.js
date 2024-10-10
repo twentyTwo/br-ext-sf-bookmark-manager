@@ -102,11 +102,8 @@ function createBookmarkPanel() {
     <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
       <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6;">
         <div class="button-group" style="display: flex; gap: 0.5rem;">
-          <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #0070d2; color: white; border: none; border-radius: 0.25rem; cursor: pointer;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
-            </svg>
-            Add Bookmark
+          <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="padding: 0.25rem 0.5rem;">
+            Bookmark this page
           </button>
           <button id="showAllBookmarksBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #f4f6f9; color: #16325c; border: 1px solid #d8dde6; border-radius: 0.25rem; cursor: pointer;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
