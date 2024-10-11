@@ -212,7 +212,8 @@ function addCurrentPageBookmark() {
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let bookmarks = result.bookmarks;
     if (!bookmarks.some(bookmark => bookmark.url === url)) {
-      bookmarks.push({url, title, orgUrl});
+      // Add the new bookmark to the beginning of the array
+      bookmarks.unshift({url, title, orgUrl});
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark added');
         flashBookmarkIcon('#4CAF50'); // Green flash for successful add
