@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Org Bookmarks</title>
+    <link rel="stylesheet" href="orgBookmarks.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="bookmarkContainer">
+        <h1>Bookmarks for <span id="orgName"></span></h1>
+        <div id="summaryTiles">
+            <div class="tile">
+                <h3>Total Bookmarks</h3>
+                <p id="totalBookmarks">0</p>
+            </div>
+            <div class="tile">
+                <h3>Total Visits</h3>
+                <p id="totalVisits">0</p>
+            </div>
+            <div class="tile">
+                <h3>Times Saved</h3>
+                <p id="timesSaved">0</p>
+            </div>
+            <div class="tile">
+                <h3>Most Visited</h3>
+                <p id="mostVisited">-</p>
+            </div>
+        </div>
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Search bookmarks...">
+            <select id="tagFilter">
+                <option value="">All Tags</option>
+            </select>
+        </div>
+        <table id="bookmarkTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Tags</th>
+                    <th>Created At</th>
+                    <th>Last Visited</th>
+                    <th>Visit Count</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="bookmarkList"></tbody>
+        </table>
+    </div>
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Bookmark</h2>
+            <input type="text" id="editTitle" placeholder="Title">
+            <input type="text" id="editTags" placeholder="Tags (comma-separated)">
+            <textarea id="editNotes" placeholder="Notes"></textarea>
+            <div class="button-group">
+                <button id="saveEdit">Save</button>
+                <button id="cancelEdit">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script src="orgBookmarks.js"></script>
+</body>
+</html>

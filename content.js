@@ -105,11 +105,8 @@ function createBookmarkPanel() {
           <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="padding: 0.25rem 0.5rem;">
             Bookmark this page
           </button>
-          <button id="showAllBookmarksBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #f4f6f9; color: #16325c; border: 1px solid #d8dde6; border-radius: 0.25rem; cursor: pointer;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 0.25rem;">
-              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8zm0 3h4v2h-4zm0-6h8v2h-8z" fill="currentColor"/>
-            </svg>
-            Show All
+          <button id="showDetailsBtn" class="slds-button slds-button_neutral" style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background-color: #f4f6f9; color: #16325c; border: 1px solid #d8dde6; border-radius: 0.25rem; cursor: pointer;">
+            Details
           </button>
         </div>
         <button type="button" class="close-btn slds-button slds-button_icon slds-button_icon-border-filled" aria-label="Close" title="Close bookmark panel" style="position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; cursor: pointer;">
@@ -167,13 +164,19 @@ function createBookmarkPanel() {
   const addBookmarkBtn = document.getElementById('addBookmarkBtn');
   addBookmarkBtn.addEventListener('click', addCurrentPageBookmark);
 
-  const showAllBookmarksBtn = document.getElementById('showAllBookmarksBtn');
-  showAllBookmarksBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({action: "openAllBookmarks"});
-  });
+  const showDetailsBtn = document.getElementById('showDetailsBtn');
+  showDetailsBtn.addEventListener('click', openOrgBookmarksDetails);
 
   // Load and display existing bookmarks
   displayBookmarks();
+}
+
+function openOrgBookmarksDetails() {
+  const currentOrgUrl = getCurrentOrgUrl();
+  chrome.runtime.sendMessage({
+    action: "openOrgBookmarks",
+    orgUrl: currentOrgUrl
+  });
 }
 
 function showNotification(message, duration = 3000) {
@@ -208,12 +211,22 @@ function addCurrentPageBookmark() {
   const url = window.location.href;
   const title = document.title;
   const orgUrl = getCurrentOrgUrl();
+  const currentTime = Date.now();
   
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let bookmarks = result.bookmarks;
     if (!bookmarks.some(bookmark => bookmark.url === url)) {
       // Add the new bookmark to the beginning of the array
-      bookmarks.unshift({url, title, orgUrl});
+      bookmarks.unshift({
+        url,
+        title,
+        orgUrl,
+        createdAt: currentTime,
+        lastVisited: currentTime,
+        visitCount: 1,
+        tags: [],
+        notes: ""
+      });
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark added');
         flashBookmarkIcon('#4CAF50'); // Green flash for successful add
@@ -295,6 +308,23 @@ function displayBookmarks() {
 
       // Add drag and drop functionality
       addDragAndDropListeners();
+
+      // Inside displayBookmarks function, after creating the bookmark items
+      document.querySelectorAll('.bookmark-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault(); // Prevent the default link behavior
+          updateBookmarkVisit(this.href);
+          window.open(this.href, '_blank'); // Open the link in a new tab
+        });
+      });
+
+      // Add event listeners for details buttons
+      document.querySelectorAll('.bookmark-details').forEach(button => {
+        button.addEventListener('click', function(e) {
+          e.stopPropagation();
+          openBookmarkDetails(this.dataset.url);
+        });
+      });
     }
   });
 }
@@ -408,6 +438,7 @@ function updateBookmarkTitle(newTitle, url) {
     const bookmarkIndex = bookmarks.findIndex(bookmark => bookmark.url === url);
     if (bookmarkIndex !== -1) {
       bookmarks[bookmarkIndex].title = newTitle;
+      bookmarks[bookmarkIndex].lastVisited = Date.now();
       chrome.storage.local.set({bookmarks: bookmarks}, function() {
         console.log('Bookmark title updated');
         showNotification('Bookmark title updated');
@@ -429,6 +460,30 @@ function removeBookmark(url) {
         showNotification('Bookmark removed');
       });
     }
+  });
+}
+
+function updateBookmarkVisit(url) {
+  chrome.storage.local.get({bookmarks: []}, function(result) {
+    let bookmarks = result.bookmarks;
+    const bookmarkIndex = bookmarks.findIndex(bookmark => bookmark.url === url);
+    if (bookmarkIndex !== -1) {
+      bookmarks[bookmarkIndex].visitCount = (bookmarks[bookmarkIndex].visitCount || 0) + 1;
+      bookmarks[bookmarkIndex].lastVisited = Date.now();
+      chrome.storage.local.set({bookmarks: bookmarks}, function() {
+        console.log('Bookmark visit count updated');
+        displayBookmarks(); // Refresh the bookmark list to show updated count
+      });
+    }
+  });
+}
+
+function openBookmarkDetails(url) {
+  const currentOrgUrl = getCurrentOrgUrl();
+  chrome.runtime.sendMessage({
+    action: "openOrgBookmarks",
+    orgUrl: currentOrgUrl,
+    bookmarkUrl: url
   });
 }
 
