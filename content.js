@@ -223,7 +223,7 @@ function addCurrentPageBookmark() {
         orgUrl,
         createdAt: currentTime,
         lastVisited: currentTime,
-        visitCount: 1,
+        visitCount: 0,
         tags: [],
         notes: ""
       });
@@ -254,8 +254,8 @@ function displayBookmarks() {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
         <li class="bookmark-item" draggable="true" data-index="${index}">
           <div class="drag-handle">☰</div>
-          <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.url}" target="_blank">
-            <span class="bookmark-title">${bookmark.title}</span>
+          <a href="${bookmark.url}" class="bookmark-li Readnk" title="${bookmark.url}" target="_blank">
+            <span class="bookmark-title">[${bookmark.visitCount || 0}] ${bookmark.title}</span>
           </a>
           <div class="bookmark-actions">
             <button class="edit-bookmark" data-url="${bookmark.url}" title="Edit bookmark">
