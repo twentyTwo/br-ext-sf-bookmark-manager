@@ -205,3 +205,21 @@ a:hover {
 #recentlyVisitedBtn.active {
     background-color: #005fb2;
 }
+
+.clarification-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    background-color: #0070d2;
+    color: white;
+    font-size: 12px;
+    cursor: help;
+    margin-left: 5px;
+}
+
+.clarification-icon:hover {
+    background-color: #005fb2;
+}

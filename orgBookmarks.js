@@ -152,12 +152,16 @@ function updateTagFilter() {
 }
 
 function updateSummaryTiles() {
-    document.getElementById('totalBookmarks').textContent = allBookmarks.length;
+    const totalBookmarks = allBookmarks.length;
+    document.getElementById('totalBookmarks').textContent = totalBookmarks;
+
     const totalVisits = allBookmarks.reduce((sum, bookmark) => sum + (bookmark.visitCount || 0), 0);
     document.getElementById('totalVisits').textContent = totalVisits;
-    document.getElementById('timesSaved').textContent = allBookmarks.length; // Assuming each bookmark was saved once
-    const mostVisited = allBookmarks.reduce((max, bookmark) => (bookmark.visitCount > (max.visitCount || 0) ? bookmark : max), {});
-    document.getElementById('mostVisited').textContent = mostVisited.title || '-';
+
+    document.getElementById('timesSaved').textContent = totalVisits * 5 + 's';
+
+    const avgVisitsPerBookmark = totalBookmarks > 0 ? (totalVisits / totalBookmarks).toFixed(2) : '0';
+    document.getElementById('avgVisitsPerBookmark').textContent = avgVisitsPerBookmark;
 }
 
 function sortByRecentlyVisited() {
