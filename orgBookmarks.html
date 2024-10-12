@@ -9,7 +9,8 @@
 </head>
 <body>
     <div id="bookmarkContainer">
-        <h1>Bookmarks for<strong></strong> <span id="orgName"></span></h1>
+        <h1>Bookmarks for <span id="orgAlias"></span> <i class="fas fa-edit" id="editOrgAlias"></i></h1>
+        <h3 class="org-url">Org Url: <span id="orgName"></span></h3>
         <div id="summaryTiles">
             <div class="tile">
                 <h3>Total Bookmarks</h3>
@@ -62,6 +63,16 @@
             <div class="button-group">
                 <button id="saveEdit">Save</button>
                 <button id="cancelEdit">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="aliasModal" class="modal">
+        <div class="modal-content">
+            <h2>Update Org Alias</h2>
+            <input type="text" id="orgAliasInput" placeholder="Enter new alias">
+            <div class="button-group">
+                <button id="saveAlias">Save</button>
+                <button id="cancelAlias">Cancel</button>
             </div>
         </div>
     </div>

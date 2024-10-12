@@ -1,5 +1,6 @@
 let allBookmarks = [];
 let currentOrgUrl = '';
+let currentOrgAlias = '';
 let currentEditingUrl = '';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -7,15 +8,66 @@ document.addEventListener('DOMContentLoaded', function() {
     currentOrgUrl = urlParams.get('org');
     document.getElementById('orgName').textContent = currentOrgUrl;
 
+    loadOrgAlias();
     loadBookmarks();
 
     document.getElementById('searchInput').addEventListener('input', filterBookmarks);
     document.getElementById('tagFilter').addEventListener('change', filterBookmarks);
     document.getElementById('saveEdit').addEventListener('click', saveEditedBookmark);
     document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
-
     document.getElementById('recentlyVisitedBtn').addEventListener('click', sortByRecentlyVisited);
+    
+    // Add event listeners for org alias editing
+    document.getElementById('editOrgAlias').addEventListener('click', openAliasModal);
+    document.getElementById('saveAlias').addEventListener('click', saveOrgAlias);
+    document.getElementById('cancelAlias').addEventListener('click', closeAliasModal);
 });
+
+function loadOrgAlias() {
+    chrome.storage.local.get({orgAliases: {}}, function(result) {
+        currentOrgAlias = result.orgAliases[currentOrgUrl] || currentOrgUrl;
+        document.getElementById('orgAlias').textContent = currentOrgAlias;
+    });
+}
+
+function openAliasModal() {
+    document.getElementById('orgAliasInput').value = currentOrgAlias;
+    document.getElementById('aliasModal').style.display = 'block';
+}
+
+function closeAliasModal() {
+    document.getElementById('aliasModal').style.display = 'none';
+}
+
+function saveOrgAlias() {
+    const newAlias = document.getElementById('orgAliasInput').value.trim();
+    if (newAlias) {
+        chrome.storage.local.get({orgAliases: {}}, function(result) {
+            let orgAliases = result.orgAliases;
+            orgAliases[currentOrgUrl] = newAlias;
+            chrome.storage.local.set({orgAliases: orgAliases}, function() {
+                currentOrgAlias = newAlias;
+                document.getElementById('orgAlias').textContent = currentOrgAlias;
+                closeAliasModal();
+                updateBookmarksWithNewAlias(newAlias);
+            });
+        });
+    }
+}
+
+function updateBookmarksWithNewAlias(newAlias) {
+    chrome.storage.local.get({bookmarks: []}, function(result) {
+        let bookmarks = result.bookmarks;
+        bookmarks.forEach(bookmark => {
+            if (bookmark.orgUrl === currentOrgUrl) {
+                bookmark.orgAlias = newAlias;
+            }
+        });
+        chrome.storage.local.set({bookmarks: bookmarks}, function() {
+            loadBookmarks();
+        });
+    });
+}
 
 function loadBookmarks() {
     chrome.storage.local.get({bookmarks: []}, function(result) {
