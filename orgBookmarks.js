@@ -34,7 +34,7 @@ function displayBookmarks(bookmarks = allBookmarks) {
             <td>${bookmark.tags ? bookmark.tags.join(', ') : ''}</td>
             <td>${new Date(bookmark.createdAt).toLocaleString()}</td>
             <td>${new Date(bookmark.lastVisited).toLocaleString()}</td>
-            <td>${bookmark.visitCount || 0}</td>
+            <td class="visit-count">${bookmark.visitCount || 0}</td>
             <td>${bookmark.notes || ''}</td>
             <td>
                 <button class="edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
@@ -53,6 +53,15 @@ function addEventListeners() {
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', deleteBookmark);
+    });
+
+    document.querySelectorAll('.bookmark-title').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.href;
+            updateBookmarkVisit(url);
+            window.open(url, '_blank');
+        });
     });
 }
 
@@ -162,4 +171,29 @@ function sortByRecentlyVisited() {
     });
 
     displayBookmarks(sortedBookmarks);
+}
+
+function updateBookmarkVisit(url) {
+    chrome.storage.local.get({bookmarks: []}, function(result) {
+        let bookmarks = result.bookmarks;
+        const bookmarkIndex = bookmarks.findIndex(bookmark => bookmark.url === url);
+        if (bookmarkIndex !== -1) {
+            bookmarks[bookmarkIndex].visitCount = (bookmarks[bookmarkIndex].visitCount || 0) + 1;
+            bookmarks[bookmarkIndex].lastVisited = Date.now();
+            chrome.storage.local.set({bookmarks: bookmarks}, function() {
+                console.log('Bookmark visit count updated');
+                // Update the visit count in the UI
+                const row = document.querySelector(`tr[data-url="${url}"]`);
+                if (row) {
+                    const visitCountCell = row.querySelector('.visit-count');
+                    if (visitCountCell) {
+                        visitCountCell.textContent = bookmarks[bookmarkIndex].visitCount;
+                    }
+                }
+                // Update allBookmarks array
+                allBookmarks = bookmarks.filter(bookmark => bookmark.orgUrl === currentOrgUrl);
+                updateSummaryTiles();
+            });
+        }
+    });
 }
