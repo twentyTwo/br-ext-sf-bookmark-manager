@@ -210,7 +210,12 @@ function updateSummaryTiles() {
     const totalVisits = allBookmarks.reduce((sum, bookmark) => sum + (bookmark.visitCount || 0), 0);
     document.getElementById('totalVisits').textContent = totalVisits;
 
-    document.getElementById('timesSaved').textContent = totalVisits * 5 + 's';
+    const timesSavedSeconds = totalVisits * 5;
+    let hours = Math.floor(timesSavedSeconds / 3600);
+    let minutes = Math.floor((timesSavedSeconds % 3600) / 60);
+    let seconds = Math.floor(timesSavedSeconds % 60);
+    const timesSavedFormatted = `${hours}h ${minutes}m ${seconds}s`;
+    document.getElementById('timesSaved').textContent = timesSavedFormatted;
 
     const avgVisitsPerBookmark = totalBookmarks > 0 ? (totalVisits / totalBookmarks).toFixed(2) : '0';
     document.getElementById('avgVisitsPerBookmark').textContent = avgVisitsPerBookmark;
