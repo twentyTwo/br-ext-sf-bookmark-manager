@@ -236,29 +236,31 @@ function addCurrentPageBookmark() {
   const orgUrl = getCurrentOrgUrl();
   const currentTime = Date.now();
   
-  chrome.storage.local.get({bookmarks: []}, function(result) {
+  chrome.storage.local.get({bookmarks: [], orgAliases: {}}, function(result) {
     let bookmarks = result.bookmarks;
+    let orgAliases = result.orgAliases;
+    if (!orgAliases[orgUrl]) {
+      orgAliases[orgUrl] = orgUrl; // Initially set alias to orgUrl
+    }
     if (!bookmarks.some(bookmark => bookmark.url === url)) {
-      // Add the new bookmark to the beginning of the array
       bookmarks.unshift({
         url,
         title,
         orgUrl,
+        orgAlias: orgAliases[orgUrl],
         createdAt: currentTime,
         lastVisited: currentTime,
         visitCount: 0,
         tags: [],
         notes: ""
       });
-      chrome.storage.local.set({bookmarks: bookmarks}, function() {
+      chrome.storage.local.set({bookmarks: bookmarks, orgAliases: orgAliases}, function() {
         console.log('Bookmark added');
-        flashBookmarkIcon('#4CAF50'); // Green flash for successful add
         displayBookmarks();
         showNotification('Bookmark added');
       });
     } else {
       console.log('Bookmark already exists');
-      flashBookmarkIcon('#FFA500'); // Orange flash for already existing
       showNotification('Bookmark already exists');
     }
   });
@@ -276,9 +278,9 @@ function displayBookmarks() {
     } else {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
         <li class="bookmark-item" draggable="true" data-index="${index}">
-          <div class="drag-handle">☰</div>
+          <div class="drag-handle">☰ [${bookmark.visitCount || 0}]</div>
           <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.title}" target="_blank">
-            <span class="bookmark-title">[${bookmark.visitCount || 0}] ${bookmark.title}</span>
+            <span class="bookmark-title">${bookmark.title}</span>
           </a>
           <div class="bookmark-actions">
             <button class="edit-bookmark" data-url="${bookmark.url}" title="Edit bookmark">
