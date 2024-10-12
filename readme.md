@@ -1,69 +1,80 @@
 # Salesforce Bookmark Manager
 
 ## Overview
-This Chrome/edge extension enhances the Salesforce interface by adding a customizable banner, bookmark functionality, and sandbox banner management.
 
-## Key Features
+Salesforce Bookmark Manager is a Chrome extension designed to enhance your productivity when working with multiple Salesforce orgs. It allows you to easily manage bookmarks, customize headers, and control sandbox banners across different Salesforce organizations.
 
-1. **Customizable Banner**
-   - Adds a colored banner to the Salesforce header
-   - Colors indicate environment type (sandbox, dev, production)
-   - Supports custom colors for specific org URLs
+## Features
 
-2. **Bookmark Functionality**
-   - Adds a bookmark icon to the Salesforce header
-   - Allows users to save and manage bookmarks for the current org
-   - Bookmarks are displayed in a panel and can be edited or removed
-
-3. **Sandbox Banner Management**
-   - Option to hide/show the default Salesforce sandbox banner
-
-## Technical Documentation
-
-### Main Functions
-
-- `addSalesforceBanner()`: Adds the custom banner to the Salesforce header
-- `addBookmarkItem()`: Adds the bookmark icon to the header
-- `createBookmarkPanel()`: Creates and displays the bookmark management panel
-- `addCurrentPageBookmark()`: Saves the current page as a bookmark
-- `displayBookmarks()`: Shows saved bookmarks in the panel
-- `updateBannerVisibility()`: Toggles the visibility of the custom banner
-- `hideSandboxBanner()`: Hides the default Salesforce sandbox banner
-- `setupSandboxBannerObserver()`: Sets up an observer to hide the sandbox banner
-
-### Storage
-
-- Uses Chrome's storage API for persisting settings and bookmarks
-- Synced storage for global settings
-- Local storage for org-specific data (bookmarks, colors, banner visibility)
-
-### Event Handling
-
-- Listens for messages from the extension's popup for toggling features
-- Observes URL changes to update the banner and bookmarks accordingly
-
-### User Interface
-
-- Custom banner in the Salesforce header
-- Bookmark icon in the header
-- Bookmark management panel
-- Confirmation messages for user actions
+1. **Org-Specific Bookmarks**: Save and manage bookmarks for each Salesforce org separately.
+2. **Quick Access**: Easily access your saved bookmarks from the extension popup.
+3. **Bookmark Statistics**: View useful statistics about your bookmarks, including total bookmarks, total visits, time saved, and average visits per bookmark.
+4. **Search and Filter**: Quickly find bookmarks using the search function or filter by tags.
+5. **Customizable Sorting**: Sort your bookmarks by recently visited or other criteria.
+6. **Edit and Delete**: Easily modify or remove existing bookmarks.
 
 ## Installation
 
-1. Clone this repository or download the source code
-2. Open Chrome and navigate to `chrome://extensions`
-3. Enable "Developer mode" in the top right corner
-4. Click "Load unpacked" and select the directory containing the extension files
+1. Download the extension from the Chrome Web Store (link to be added).
+2. Click "Add to Chrome" to install the extension.
+3. Once installed, you'll see the Salesforce Bookmark Manager icon in your Chrome toolbar.
 
-## Usage
+## How to Use
 
-After installation, the extension will automatically activate on Salesforce domains. Use the extension popup to toggle features and customize settings.
+### Adding a Bookmark
 
-## Contributing
+1. Navigate to the Salesforce page you want to bookmark.
+2. Click the Salesforce Bookmark Manager icon in the Chrome toolbar.
+3. Click the "Bookmark this page" button in the popup.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Viewing Bookmarks
 
-## License
+1. Click the Salesforce Bookmark Manager icon in the Chrome toolbar.
+2. You'll see a list of bookmarks for the current Salesforce org.
+3. Click on a bookmark to open it in a new tab.
 
-This project is licensed under the MIT License.
+### Managing Bookmarks
+
+1. Click "Show All Bookmarks" in the extension popup to open the full bookmark manager.
+2. Here you can:
+   - Search for bookmarks
+   - Filter bookmarks by tags
+   - Edit bookmark details (title, tags, notes)
+   - Delete bookmarks
+   - Sort bookmarks by recently visited
+
+### Bookmark Statistics
+
+In the full bookmark manager, you'll see tiles showing:
+- Total Bookmarks
+- Total Visits
+- Time Saved (based on estimated time saved compared to standard Salesforce search)
+- Average Visits per Bookmark
+
+## Tips for Effective Use
+
+1. Use tags to categorize your bookmarks for easier filtering.
+2. Regularly review and update your bookmarks to keep them relevant.
+3. Use the search function to quickly find specific bookmarks.
+4. Pay attention to the "Average Visits per Bookmark" stat to identify your most useful bookmarks.
+
+## Troubleshooting
+
+If you encounter any issues:
+1. Ensure the extension is up to date.
+2. Try refreshing the Salesforce page.
+3. If problems persist, click the "Report Issue" link in the extension popup to submit a bug report.
+
+## Privacy and Data Security
+
+- All bookmark data is stored locally in your browser.
+- No data is sent to external servers.
+- Your bookmarks are specific to your Chrome profile and are not shared across devices unless you use Chrome sync.
+
+## Feedback and Support
+
+We value your feedback! If you have suggestions or need support:
+- Use the "Report Issue" link in the extension popup for bug reports.
+- Contact the developer through the provided LinkedIn profile for other inquiries.
+
+Thank you for using Salesforce Bookmark Manager!
