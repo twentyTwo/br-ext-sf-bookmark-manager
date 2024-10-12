@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('tagFilter').addEventListener('change', filterBookmarks);
     document.getElementById('saveEdit').addEventListener('click', saveEditedBookmark);
     document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
+
+    document.getElementById('recentlyVisitedBtn').addEventListener('click', sortByRecentlyVisited);
 });
 
 function loadBookmarks() {
@@ -24,7 +26,7 @@ function loadBookmarks() {
     });
 }
 
-function displayBookmarks(bookmarks) {
+function displayBookmarks(bookmarks = allBookmarks) {
     const bookmarkList = document.getElementById('bookmarkList');
     bookmarkList.innerHTML = bookmarks.map(bookmark => `
         <tr data-url="${bookmark.url}">
@@ -115,6 +117,15 @@ function filterBookmarks() {
         return matchesSearch && matchesTag;
     });
 
+    // Maintain the current sort order
+    const currentSort = document.getElementById('recentlyVisitedBtn').classList.contains('active') 
+        ? (a, b) => b.lastVisited - a.lastVisited 
+        : null;
+
+    if (currentSort) {
+        filteredBookmarks.sort(currentSort);
+    }
+
     displayBookmarks(filteredBookmarks);
 }
 
@@ -138,4 +149,17 @@ function updateSummaryTiles() {
     document.getElementById('timesSaved').textContent = allBookmarks.length; // Assuming each bookmark was saved once
     const mostVisited = allBookmarks.reduce((max, bookmark) => (bookmark.visitCount > (max.visitCount || 0) ? bookmark : max), {});
     document.getElementById('mostVisited').textContent = mostVisited.title || '-';
+}
+
+function sortByRecentlyVisited() {
+    const btn = document.getElementById('recentlyVisitedBtn');
+    btn.classList.toggle('active');
+
+    const sortedBookmarks = [...allBookmarks].sort((a, b) => {
+        return btn.classList.contains('active') 
+            ? b.lastVisited - a.lastVisited 
+            : a.lastVisited - b.lastVisited;
+    });
+
+    displayBookmarks(sortedBookmarks);
 }
