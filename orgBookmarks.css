@@ -149,7 +149,7 @@ a:hover {
 .modal-content textarea {
     width: 100%;
     padding: 8px 12px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;  /* Reduced from 15px to 5px */
     border: 1px solid #d8dde6;
     border-radius: 4px;
     font-size: 14px;
@@ -266,4 +266,11 @@ a:hover {
     font-size: 0.75rem;
     color: #666;
     margin-top: -15px;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 0;
+    margin-bottom: 10px;
 }

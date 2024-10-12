@@ -135,23 +135,43 @@ function closeEditModal() {
 
 function saveEditedBookmark() {
     const title = document.getElementById('editTitle').value;
-    const tags = document.getElementById('editTags').value.split(',').map(tag => tag.trim());
+    const tags = document.getElementById('editTags').value;
     const notes = document.getElementById('editNotes').value;
-
-    chrome.storage.local.get({bookmarks: []}, function(result) {
-        let bookmarks = result.bookmarks;
-        const index = bookmarks.findIndex(b => b.url === currentEditingUrl);
-        if (index !== -1) {
-            bookmarks[index].title = title;
-            bookmarks[index].tags = tags;
-            bookmarks[index].notes = notes;
-            chrome.storage.local.set({bookmarks: bookmarks}, function() {
-                console.log('Bookmark updated');
-                loadBookmarks();
-                closeEditModal();
-            });
-        }
-    });
+    
+    const tagsError = document.getElementById('tagsError');
+    const notesError = document.getElementById('notesError');
+    
+    tagsError.textContent = '';
+    notesError.textContent = '';
+    
+    let isValid = true;
+    
+    if (!validateTags(tags)) {
+        tagsError.textContent = 'Each tag must be 10 characters or less.';
+        isValid = false;
+    }
+    
+    if (!validateNotes(notes)) {
+        notesError.textContent = 'Notes must be 255 characters or less.';
+        isValid = false;
+    }
+    
+    if (isValid) {
+        chrome.storage.local.get({bookmarks: []}, function(result) {
+            let bookmarks = result.bookmarks;
+            const index = bookmarks.findIndex(b => b.url === currentEditingUrl);
+            if (index !== -1) {
+                bookmarks[index].title = title;
+                bookmarks[index].tags = tags.split(',').map(tag => tag.trim());
+                bookmarks[index].notes = notes;
+                chrome.storage.local.set({bookmarks: bookmarks}, function() {
+                    console.log('Bookmark updated');
+                    loadBookmarks();
+                    closeEditModal();
+                });
+            }
+        });
+    }
 }
 
 function deleteBookmark(e) {
@@ -258,3 +278,16 @@ function updateBookmarkVisit(url) {
         }
     });
 }
+
+// Add these functions near the top of your file
+function validateTags(tags) {
+    const tagArray = tags.split(',').map(tag => tag.trim());
+    return tagArray.every(tag => tag.length <= 10);
+}
+
+function validateNotes(notes) {
+    return notes.length <= 255;
+}
+
+// Update the saveEdit event listener
+document.getElementById('saveEdit').addEventListener('click', saveEditedBookmark);
