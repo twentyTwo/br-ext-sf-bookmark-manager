@@ -132,6 +132,7 @@ function createBookmarkPanel() {
         cursor: grab;
         padding: 0 8px;
         color: #999;
+        flex-shrink: 0;
       }
       .bookmark-item.dragging {
         opacity: 0.5;
@@ -142,13 +143,35 @@ function createBookmarkPanel() {
       }
       .bookmark-link {
         flex-grow: 1;
+        min-width: 0; /* This allows the text to shrink below its content size */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-right: 8px;
+      }
+      .bookmark-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
       }
       .bookmark-actions {
         display: flex;
-        gap: 5px;
+        gap: 4px;
+        flex-shrink: 0;
+      }
+      .bookmark-actions button {
+        padding: 2px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .bookmark-actions svg {
+        width: 14px;
+        height: 14px;
       }
     </style>
   `;
@@ -254,17 +277,17 @@ function displayBookmarks() {
       bookmarkList.innerHTML = bookmarks.map((bookmark, index) => `
         <li class="bookmark-item" draggable="true" data-index="${index}">
           <div class="drag-handle">☰</div>
-          <a href="${bookmark.url}" class="bookmark-li Readnk" title="${bookmark.url}" target="_blank">
+          <a href="${bookmark.url}" class="bookmark-link" title="${bookmark.title}" target="_blank">
             <span class="bookmark-title">[${bookmark.visitCount || 0}] ${bookmark.title}</span>
           </a>
           <div class="bookmark-actions">
             <button class="edit-bookmark" data-url="${bookmark.url}" title="Edit bookmark">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="#0070d2"/>
               </svg>
             </button>
             <button class="remove-bookmark" data-url="${bookmark.url}" title="Remove bookmark">
-              <svg width="12" height="12" viewBox="0 0 52 52">
+              <svg viewBox="0 0 52 52">
                 <path fill="#c23934" d="M31.6 25.8l13.1-13.1c.6-.6.6-1.5 0-2.1l-2.1-2.1c-.6-.6-1.5-.6-2.1 0L27.4 21.6c-.4.4-1 .4-1.4 0L12.9 8.4c-.6-.6-1.5-.6-2.1 0l-2.1 2.1c-.6.6-.6 1.5 0 2.1l13.1 13.1c.4.4.4 1 0 1.4L8.7 40.3c-.6.6-.6 1.5 0 2.1l2.1 2.1c.6.6 1.5.6 2.1 0L26 31.4c.4-.4 1-.4 1.4 0l13.1 13.1c.6.6 1.5.6 2.1 0l2.1-2.1c.6-.6.6-1.5 0-2.1L31.6 27.2c-.4-.4-.4-1 0-1.4z"/>
               </svg>
             </button>
