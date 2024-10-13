@@ -2,6 +2,8 @@ let allBookmarks = [];
 let currentOrgUrl = '';
 let currentOrgAlias = '';
 let currentEditingUrl = '';
+let currentSortColumn = '';
+let currentSortOrder = 'asc';
 
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -21,6 +23,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('editOrgAlias').addEventListener('click', openAliasModal);
     document.getElementById('saveAlias').addEventListener('click', saveOrgAlias);
     document.getElementById('cancelAlias').addEventListener('click', closeAliasModal);
+
+    // Add event listeners for sorting
+    document.querySelectorAll('th.sortable').forEach(th => {
+        th.addEventListener('click', () => sortBookmarks(th.dataset.sort));
+    });
 });
 
 function loadOrgAlias() {
@@ -96,6 +103,7 @@ function displayBookmarks(bookmarks = allBookmarks) {
     `).join('');
 
     addEventListeners();
+    updateSortIcons();
 }
 
 function addEventListeners() {
@@ -198,16 +206,11 @@ function filterBookmarks() {
         return matchesSearch && matchesTag;
     });
 
-    // Maintain the current sort order
-    const currentSort = document.getElementById('recentlyVisitedBtn').classList.contains('active') 
-        ? (a, b) => b.lastVisited - a.lastVisited 
-        : null;
-
-    if (currentSort) {
-        filteredBookmarks.sort(currentSort);
+    if (currentSortColumn) {
+        sortBookmarks(currentSortColumn);
+    } else {
+        displayBookmarks(filteredBookmarks);
     }
-
-    displayBookmarks(filteredBookmarks);
 }
 
 function updateTagFilter() {
@@ -277,6 +280,54 @@ function updateBookmarkVisit(url) {
             });
         }
     });
+}
+
+function sortBookmarks(column) {
+    const sortOrder = column === currentSortColumn && currentSortOrder === 'asc' ? 'desc' : 'asc';
+    currentSortColumn = column;
+    currentSortOrder = sortOrder;
+
+    allBookmarks.sort((a, b) => {
+        let valueA, valueB;
+
+        switch (column) {
+            case 'title':
+                valueA = a.title.toLowerCase();
+                valueB = b.title.toLowerCase();
+                break;
+            case 'createdAt':
+                valueA = new Date(a.createdAt);
+                valueB = new Date(b.createdAt);
+                break;
+            case 'lastVisited':
+                valueA = new Date(a.lastVisited);
+                valueB = new Date(b.lastVisited);
+                break;
+            case 'visitCount':
+                valueA = a.visitCount || 0;
+                valueB = b.visitCount || 0;
+                break;
+        }
+
+        if (valueA < valueB) return sortOrder === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    displayBookmarks();
+    updateSortIcons();
+}
+
+function updateSortIcons() {
+    document.querySelectorAll('th.sortable i').forEach(icon => {
+        icon.className = 'fas fa-sort';
+    });
+
+    const currentSortHeader = document.querySelector(`th[data-sort="${currentSortColumn}"]`);
+    if (currentSortHeader) {
+        const icon = currentSortHeader.querySelector('i');
+        icon.className = `fas fa-sort-${currentSortOrder === 'asc' ? 'up' : 'down'}`;
+    }
 }
 
 // Add these functions near the top of your file

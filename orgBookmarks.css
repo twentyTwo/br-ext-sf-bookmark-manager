@@ -86,6 +86,14 @@ tr:last-child td {
     border-bottom: none;
 }
 
+th.sortable {
+    cursor: pointer;
+}
+
+th.sortable:hover {
+    background-color: #f0f0f0;
+}
+
 button {
     padding: 6px;
     cursor: pointer;

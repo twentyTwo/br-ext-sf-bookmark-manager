@@ -1,4 +1,5 @@
 let showBookmark = true;
+let extensionId = chrome.runtime.id;
 
 function addSalesforceBanner() {
   console.log('addSalesforceBanner called');
@@ -12,7 +13,7 @@ function addSalesforceBanner() {
     }
 
     console.log('Header element found');
-    addBookmarkItem();
+    addBookmarkButton();
     return true;
   }
 
@@ -196,10 +197,20 @@ function createBookmarkPanel() {
 
 function openOrgBookmarksDetails() {
   const currentOrgUrl = getCurrentOrgUrl();
-  chrome.runtime.sendMessage({
-    action: "openOrgBookmarks",
-    orgUrl: currentOrgUrl
-  });
+  try {
+    chrome.runtime.sendMessage(extensionId, {
+      action: "openOrgBookmarks",
+      orgUrl: currentOrgUrl
+    }, function(response) {
+      if (chrome.runtime.lastError) {
+        console.log("Extension context invalidated. Reloading page.");
+        window.location.reload();
+      }
+    });
+  } catch (e) {
+    console.log("Error sending message. Reloading page.");
+    window.location.reload();
+  }
 }
 
 function showNotification(message, duration = 3000) {
@@ -582,4 +593,58 @@ function flashBookmarkIcon(color, duration = 2000) {
   //     bookmarkIcon.setAttribute('fill', originalFill);
   //   }, duration);
   // }
+}
+
+// Redefine the message listener
+function setupMessageListener() {
+  chrome.runtime.onMessage.removeListener(handleMessage);
+  chrome.runtime.onMessage.addListener(handleMessage);
+}
+
+function handleMessage(request, sender, sendResponse) {
+  if (request.action === "updateButton") {
+    updateBookmarkButton(request.isBookmarked);
+  }
+}
+
+// Initial setup
+addSalesforceBanner(); // This function should include the call to addBookmarkButton()
+setupMessageListener();
+
+// Periodically check if the extension is still valid
+setInterval(() => {
+  try {
+    chrome.runtime.getURL('');
+  } catch (e) {
+    console.log("Extension context invalidated. Reloading page.");
+    window.location.reload();
+  }
+}, 5000);  // Check every 5 seconds
+
+function addBookmarkButton() {
+  if (!showBookmark) return;
+
+  const notificationIcon = document.querySelector('.slds-global-actions__item_notification');
+  if (notificationIcon && !document.querySelector('.custom-bookmark-item')) {
+    
+    const bookmarkItemHtml = `
+      <li class="slds-global-actions__item slds-dropdown-trigger slds-dropdown-trigger_click custom-bookmark-item">
+        <div class="forceHeaderButton">
+          <button aria-expanded="false" aria-haspopup="true" type="button" class="slds-button slds-button_icon slds-button_icon-container slds-button_icon-small slds-global-actions__item-action">
+            <div class="tooltipTrigger tooltip-trigger uiTooltip">
+              <svg focusable="false" aria-hidden="true" viewBox="0 0 520 520" part="icon" class="slds-icon slds-icon_x-small">
+                <path d="M130 0h260c17 0 30 13 30 30v460c0 6-7 10-13 7l-147-86-147 86c-6 3-13-1-13-7V30c0-17 13-30 30-30z" fill="#919191"></path>
+              </svg>
+              <span role="tooltip" class="tooltip-invisible">Bookmarks</span>
+            </div>
+          </button>
+        </div>
+      </li>
+    `;
+    notificationIcon.insertAdjacentHTML('afterend', bookmarkItemHtml);
+    
+    // Add click event listener to the new bookmark item
+    const bookmarkItem = document.querySelector('.custom-bookmark-item');
+    bookmarkItem.addEventListener('click', handleBookmarkItemClick);
+  }
 }

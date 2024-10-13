@@ -3,7 +3,11 @@
   "name": "Salesforce Bookmark Manager",
   "version": "1.0",
   "description": "Manage multiple Salesforce orgs with custom headers, bookmarks, and sandbox banner controls for improved organization.",
-  "permissions": ["activeTab", "storage", "tabs"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
