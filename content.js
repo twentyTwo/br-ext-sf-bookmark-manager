@@ -99,8 +99,11 @@ function createBookmarkPanel() {
     panel.remove();
   }
 
+  const isSandboxOrg = window.location.hostname.includes('.sandbox.');
+  const topPosition = isSandboxOrg ? '87px' : '50px';
+
   const panelHtml = `
-    <div class="bookmark-panel container" style="position: fixed; top: 50px; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
+    <div class="bookmark-panel container" style="position: fixed; top: ${topPosition}; right: 10px; width: 300px; background: white; border: 1px solid #d8dde6; border-radius: 0.25rem; box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16); z-index: 9999; font-family: Arial, sans-serif;">
       <div class="panel-header" style="padding: 0.75rem; border-bottom: 1px solid #d8dde6;">
         <div class="button-group" style="display: flex; gap: 0.5rem;">
           <button id="addBookmarkBtn" class="slds-button slds-button_neutral" style="padding: 0.25rem 0.5rem;">

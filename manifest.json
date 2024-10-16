@@ -18,7 +18,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.force.com/*", "*://*.salesforce.com/*"],
+      "matches": ["*://*.force.com/*", "*://*.salesforce.com/*","*://*.salesforce-setup.com/*"],
       "css": ["styles.css"],
       "js": ["content.js"]
     }
