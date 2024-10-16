@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('tagFilter').addEventListener('change', filterBookmarks);
     document.getElementById('saveEdit').addEventListener('click', saveEditedBookmark);
     document.getElementById('cancelEdit').addEventListener('click', closeEditModal);
-    document.getElementById('recentlyVisitedBtn').addEventListener('click', sortByRecentlyVisited);
+    // document.getElementById('recentlyVisitedBtn').addEventListener('click', sortByRecentlyVisited);
     
     // Add event listeners for org alias editing
     document.getElementById('editOrgAlias').addEventListener('click', openAliasModal);
@@ -244,18 +244,18 @@ function updateSummaryTiles() {
     document.getElementById('avgVisitsPerBookmark').textContent = avgVisitsPerBookmark;
 }
 
-function sortByRecentlyVisited() {
-    const btn = document.getElementById('recentlyVisitedBtn');
-    btn.classList.toggle('active');
+// function sortByRecentlyVisited() {
+//     const btn = document.getElementById('recentlyVisitedBtn');
+//     btn.classList.toggle('active');
 
-    const sortedBookmarks = [...allBookmarks].sort((a, b) => {
-        return btn.classList.contains('active') 
-            ? b.lastVisited - a.lastVisited 
-            : a.lastVisited - b.lastVisited;
-    });
+//     const sortedBookmarks = [...allBookmarks].sort((a, b) => {
+//         return btn.classList.contains('active') 
+//             ? b.lastVisited - a.lastVisited 
+//             : a.lastVisited - b.lastVisited;
+//     });
 
-    displayBookmarks(sortedBookmarks);
-}
+//     displayBookmarks(sortedBookmarks);
+// }
 
 function updateBookmarkVisit(url) {
     chrome.storage.local.get({bookmarks: []}, function(result) {

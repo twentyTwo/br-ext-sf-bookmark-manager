@@ -196,7 +196,7 @@ a:hover {
     background-color: #e0e0e0;
 }
 
-#recentlyVisitedBtn {
+/* #recentlyVisitedBtn {
     padding: 8px 12px;
     background-color: #0070d2;
     color: white;
@@ -212,7 +212,7 @@ a:hover {
 
 #recentlyVisitedBtn.active {
     background-color: #005fb2;
-}
+} */
 
 .clarification-icon {
     display: inline-block;
