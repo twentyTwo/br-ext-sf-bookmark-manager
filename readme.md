@@ -1,22 +1,27 @@
 # Salesforce Bookmark Manager
-![icon128](icon128.png)
-
-
-
-## Overview
-
-Salesforce Bookmark Manager is a Chrome extension designed to enhance your productivity when working with multiple Salesforce orgs. It allows you to easily manage bookmarks, customize headers, and control sandbox banners across different Salesforce organizations.
+<div style="display: flex; align-items: center;">
+  <img src="icon128.png" alt="icon" style="margin-right: 10px;">
+  <p>Salesforce Bookmark Manager is a Chrome extension designed to enhance your productivity. It allows you to easily manage bookmarks across different Salesforce organizations, providing quick access to frequently used pages and custom views.</p>
+</div>
 
 ## Features
 
 1. **Org-Specific Bookmarks**: Save and manage bookmarks for each Salesforce org separately.
-2. **Quick Access**: Easily access your saved bookmarks from the extension popup.
-3. **Bookmark Statistics**: View useful statistics about your bookmarks, including total bookmarks, total visits, time saved, and average visits per bookmark.
+2. **Quick Access**: Easily access your saved bookmarks from the extension popup or directly from the Salesforce header.
+3. **Bookmark Statistics**: View useful statistics about your bookmarks, including total bookmarks, total visits, estimated time saved, and average visits per bookmark.
 4. **Search and Filter**: Quickly find bookmarks using the search function or filter by tags.
-5. **Customizable Sorting**: Sort your bookmarks by recently visited or other criteria.
+5. **Customizable Sorting**: Sort your bookmarks by title, creation date, last visited date, or visit count.
 6. **Edit and Delete**: Easily modify or remove existing bookmarks.
 7. **Org Alias**: Assign custom alias names to your Salesforce orgs for easy identification.
-8. **Drag and Drop**: Reorder bookmarks using drag and drop functionality.
+8. **Drag and Drop**: Reorder bookmarks using intuitive drag and drop functionality.
+9. **Automatic Org Detection**: The extension automatically detects the current Salesforce org and displays relevant bookmarks.
+
+## Key Improvements
+
+- **Enhanced Drag and Drop**: The drag and drop functionality has been improved to provide a more intuitive user experience, allowing for easier reordering of bookmarks.
+- **Inline Title Editing**: Quickly edit bookmark titles directly in the bookmark list without opening a separate edit modal.
+- **Automatic Visit Tracking**: The extension now automatically tracks and updates visit counts for bookmarks when you click on them.
+- **Improved Performance**: Optimized storage and retrieval of bookmarks for faster loading and smoother user experience.
 
 ## Screenshots
 ### Bookmark Panel: 
