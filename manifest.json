@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Salesforce Bookmark Manager",
-  "version": "1.0",
-  "description": "Manage multiple Salesforce orgs with custom headers, bookmarks, and sandbox banner controls for improved organization.",
+  "version": "2.0",
+  "description": "Salesforce Bookmark Manager is designed to easily manage bookmarks across different Salesforce orgs, providing quick access to frequently used pages and custom views.",
   "permissions": [
     "storage",
     "tabs",

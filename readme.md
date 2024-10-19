@@ -1,7 +1,7 @@
 # Salesforce Bookmark Manager
 <div style="display: flex; align-items: center;">
   <img src="icon128.png" alt="icon" style="margin-right: 10px;">
-  <p>Salesforce Bookmark Manager is a Chrome extension designed to enhance your productivity. It allows you to easily manage bookmarks across different Salesforce organizations, providing quick access to frequently used pages and custom views.</p>
+  <p>Salesforce Bookmark Manager is a browser extension designed to enhance your productivity. It allows you to easily manage bookmarks across different Salesforce organizations, providing quick access to frequently used pages and custom views.</p>
 </div>
 
 ## Features
