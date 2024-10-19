@@ -1,6 +1,11 @@
 let showBookmark = true;
 let extensionId = chrome.runtime.id;
 
+// Add these variables at the top of your file
+let draggedItem = null;
+let placeholder = document.createElement('li');
+placeholder.className = 'placeholder';
+
 function addSalesforceBanner() {
   console.log('addSalesforceBanner called');
 
@@ -370,90 +375,41 @@ function displayBookmarks() {
 
 function addDragAndDropListeners() {
   const bookmarkList = document.getElementById('bookmarkList');
-  let draggedItem = null;
 
-  bookmarkList.addEventListener('dragstart', function(e) {
+  bookmarkList.addEventListener('dragstart', (e) => {
     draggedItem = e.target.closest('.bookmark-item');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', draggedItem.innerHTML);
+    e.dataTransfer.setData('text/html', draggedItem.outerHTML);
     draggedItem.classList.add('dragging');
-    
-    // Set the drag image to the entire bookmark item
-    e.dataTransfer.setDragImage(draggedItem, 0, 0);
-    
-    // Change cursor to grabbing for the dragged item
-    draggedItem.style.cursor = 'grabbing';
   });
 
-  bookmarkList.addEventListener('dragover', function(e) {
+  bookmarkList.addEventListener('dragover', (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    const targetItem = e.target.closest('.bookmark-item');
-    if (targetItem && targetItem !== draggedItem) {
-      const boundingRect = targetItem.getBoundingClientRect();
-      const offset = boundingRect.y + (boundingRect.height / 2);
-      if (e.clientY - offset > 0) {
-        targetItem.style.borderBottom = 'solid 2px #0070d2';
-        targetItem.style.borderTop = '';
+    const target = e.target.closest('.bookmark-item');
+    if (target && target !== draggedItem && target !== placeholder) {
+      const targetRect = target.getBoundingClientRect();
+      const targetCenter = targetRect.top + targetRect.height / 2;
+      if (e.clientY < targetCenter) {
+        target.parentNode.insertBefore(placeholder, target);
       } else {
-        targetItem.style.borderTop = 'solid 2px #0070d2';
-        targetItem.style.borderBottom = '';
+        target.parentNode.insertBefore(placeholder, target.nextSibling);
       }
     }
   });
 
-  bookmarkList.addEventListener('dragleave', function(e) {
-    const item = e.target.closest('.bookmark-item');
-    if (item) {
-      item.style.borderTop = '';
-      item.style.borderBottom = '';
-    }
-  });
-
-  bookmarkList.addEventListener('drop', function(e) {
+  bookmarkList.addEventListener('dragend', (e) => {
     e.preventDefault();
-    const targetItem = e.target.closest('.bookmark-item');
-    if (targetItem && targetItem !== draggedItem) {
-      const items = Array.from(bookmarkList.querySelectorAll('.bookmark-item'));
-      const fromIndex = items.indexOf(draggedItem);
-      const toIndex = items.indexOf(targetItem);
-      
-      if (fromIndex < toIndex) {
-        bookmarkList.insertBefore(draggedItem, targetItem.nextSibling);
-      } else {
-        bookmarkList.insertBefore(draggedItem, targetItem);
-      }
-      
-      updateBookmarkOrder();
-    }
-    if (targetItem) {
-      targetItem.style.borderTop = '';
-      targetItem.style.borderBottom = '';
-    }
-    
-    // Reset cursor for all items
-    bookmarkList.querySelectorAll('.bookmark-item').forEach(item => {
-      item.style.cursor = '';
-    });
-  });
-
-  bookmarkList.addEventListener('dragend', function(e) {
-    if (draggedItem) {
-      draggedItem.classList.remove('dragging');
-      draggedItem.style.cursor = '';
-    }
+    draggedItem.classList.remove('dragging');
+    placeholder.parentNode && placeholder.parentNode.replaceChild(draggedItem, placeholder);
     draggedItem = null;
-    
-    // Reset cursor for all items
-    bookmarkList.querySelectorAll('.bookmark-item').forEach(item => {
-      item.style.cursor = '';
-    });
+    updateBookmarkOrder();
   });
 }
 
 function updateBookmarkOrder() {
-  const currentOrgUrl = getCurrentOrgUrl();
   const bookmarkItems = Array.from(document.querySelectorAll('.bookmark-item'));
+  const currentOrgUrl = getCurrentOrgUrl();
   
   chrome.storage.local.get({bookmarks: []}, function(result) {
     let allBookmarks = result.bookmarks;
@@ -466,7 +422,7 @@ function updateBookmarkOrder() {
     
     chrome.storage.local.set({bookmarks: allBookmarks}, function() {
       console.log('Bookmark order updated');
-      showNotification('Bookmark order updated');
+      displayBookmarks(); // Refresh the display
     });
   });
 }
