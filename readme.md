@@ -44,7 +44,7 @@ This is the page that shows when you click on the "Show All Bookmarks" button on
 
 ## Salesforce Bookmark Manager at a glance:
 
-This is the animation that shows when you click on the Salesforce Bookmark Manager icon on the Chrome toolbar.
+This is the full view of the Salesforce Bookmark Manager.
 
 ![Screenshot 1](https://raw.githubusercontent.com/twentyTwo/static-file-hosting/refs/heads/main/br-ext-sf-bookmark-manager/Animation.webp)
 
