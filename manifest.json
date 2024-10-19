@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Salesforce Bookmark Manager",
   "version": "2.0",
-  "description": "Salesforce Bookmark Manager is designed to easily manage bookmarks across different Salesforce orgs, providing quick access to frequently used pages and custom views.",
+  "description": "Salesforce Bookmark Manager is designed to easily manage bookmarks across different Salesforce orgs.",
   "permissions": [
     "storage",
     "tabs",
